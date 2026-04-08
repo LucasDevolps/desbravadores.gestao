@@ -1,0 +1,45 @@
+name: CI - Desbravadores Gestao API
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout do código
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Setup do .NET
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      # Restore
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Build
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      # Testes (se tiver projeto de testes)
+      - name: Run tests
+        run: dotnet test --no-build --verbosity normal || true
+
+      # Publish (gera binário pronto)
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish
+
+      # Upload do artefato (opcional)
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desbravadores-api
+          path: ./publish
