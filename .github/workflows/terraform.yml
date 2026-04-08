@@ -1,0 +1,47 @@
+name: Terraform CI
+
+on:
+  pull_request:
+    branches: ["main", "develop", "master"]
+  push:
+    branches: ["develop"]
+
+jobs:
+  terraform:
+    name: Terraform Validate and Plan
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./infra
+
+    env:
+      TF_IN_AUTOMATION: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.8.5
+          terraform_wrapper: false
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -no-color -out=tfplan
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: ./infra/tfplan
