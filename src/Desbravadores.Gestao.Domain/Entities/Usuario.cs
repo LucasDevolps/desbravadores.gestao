@@ -1,4 +1,6 @@
-﻿namespace Desbravadores.Gestao.Domain;
+﻿using Microsoft.AspNet.Identity;
+
+namespace Desbravadores.Gestao.Domain;
 
 public sealed class Usuario(string nome, string email, string senha)
 {
@@ -7,4 +9,5 @@ public sealed class Usuario(string nome, string email, string senha)
     public string Email { get; private set; } = email;
     public string Senha { get; private set; } = senha;
     public DateOnly DataCriacao { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+
 }
