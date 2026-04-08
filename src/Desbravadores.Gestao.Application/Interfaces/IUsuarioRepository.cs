@@ -11,4 +11,5 @@ public interface IUsuarioRepository
     Task<IEnumerable<Usuario>> GetAllAsync(CancellationToken cancellationToken = default);
     Task RemoveAsync(Usuario usuario, CancellationToken cancellationToken = default);
     Task UpdateAsync(Usuario usuario, CancellationToken cancellationToken = default);
+    
 }
