@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Desbravadores.Gestao.Api/Desbravadores.Gestao.Api.csproj" />
+    <Project Path="src/Desbravadores.Gestao.Application/Desbravadores.Gestao.Application.csproj" />
+    <Project Path="src/Desbravadores.Gestao.Domain/Desbravadores.Gestao.Domain.csproj" />
+    <Project Path="src/Desbravadores.Gestao.Infrastructure/Desbravadores.Gestao.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Desbravadores.Gestao.UnitTests/Desbravadores.Gestao.UnitTests.csproj" />
+  </Folder>
+</Solution>
