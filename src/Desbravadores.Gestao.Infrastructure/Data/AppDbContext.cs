@@ -1,0 +1,37 @@
+﻿using Desbravadores.Gestao.Domain;
+using Microsoft.EntityFrameworkCore;
+
+namespace Desbravadores.Gestao.Infrastructure.Data
+{
+  public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+  {
+    public DbSet<Usuario> Usuarios => Set<Usuario>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+      modelBuilder.Entity<Usuario>(entity =>
+      {
+        entity.ToTable("Usuarios");
+
+        entity.HasKey(x => x.Id);
+
+        entity.Property(x => x.Nome)
+            .IsRequired()
+            .HasMaxLength(150);
+
+        entity.Property(x => x.Email)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        entity.Property(x => x.Senha)
+            .IsRequired();
+
+        entity.Property(x => x.DataCriacao)
+            .IsRequired();
+
+        entity.HasIndex(x => x.Email)
+            .IsUnique();
+      });
+    }
+  }
+}
