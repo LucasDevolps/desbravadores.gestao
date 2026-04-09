@@ -10,15 +10,15 @@ namespace Desbravadores.Gestao.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(LoginHandler loginHandler, IValidator<LoginRequest> validator) : ControllerBase
+public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
 {
-  private readonly LoginHandler _loginHandler = loginHandler;
   private readonly IValidator<LoginRequest> _validator = validator;
 
   [HttpPost("login")]
   [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   public async Task<IActionResult> Login(
+      [FromServices] LoginRequestHandler loginRequestHandler,
       [FromBody] LoginRequest request,
       CancellationToken cancellationToken)
   {
@@ -29,7 +29,7 @@ public class AuthController(LoginHandler loginHandler, IValidator<LoginRequest> 
       return BadRequest(validationResult.Errors);
     }
 
-    var response = await _loginHandler.HandleAsync(request, cancellationToken);
+    var response = await loginRequestHandler.HandleAsync(request, cancellationToken);
     return Ok(response);
   }
   [Authorize]

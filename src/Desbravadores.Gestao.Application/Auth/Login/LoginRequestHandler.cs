@@ -5,7 +5,7 @@ using Desbravadores.Gestao.Domain.Interfaces.Repositories;
 
 namespace Desbravadores.Gestao.Application.Auth.Login;
 
-public sealed class LoginHandler(
+public sealed class LoginRequestHandler(
     IUsuarioRepository usuarioRepository,
     IUsuarioSessaoRepository usuarioSessaoRepository,
     ITokenService tokenService)

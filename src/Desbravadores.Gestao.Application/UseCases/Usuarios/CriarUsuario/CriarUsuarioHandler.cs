@@ -20,7 +20,8 @@ public sealed class CriarUsuarioHandler(IUsuarioRepository usuarioRepository)
     var usuario = new Usuario(
       command.Nome.Trim(),
       command.Email.Trim().ToLowerInvariant(),
-      senhaHash
+      senhaHash,
+      command.Roles.Trim()
     );
 
     await _usuarioRepository.AdicionarUsuarioAsync(usuario, cancellationToken);
