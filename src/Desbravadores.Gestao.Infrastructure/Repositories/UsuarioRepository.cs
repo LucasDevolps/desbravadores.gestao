@@ -20,7 +20,7 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
     => await _context.Usuarios
         .Select(u => new UsuarioDTO
         {
-            Id = u.Id,
+            Id = u.Uuid,
             Nome = u.Nome,
             Email = u.Email,
             DataCriacao = u.DataCriacao
@@ -36,10 +36,10 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
 
   public async Task<UsuarioDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     => await _context.Usuarios
-        .Where(u => u.Id == id)
+        .Where(u => u.Uuid == id)
         .Select(u => new UsuarioDTO
         {
-            Id = u.Id,
+            Id = u.Uuid,
             Nome = u.Nome,
             Email = u.Email,
             DataCriacao = u.DataCriacao
@@ -47,7 +47,7 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
         .FirstOrDefaultAsync(cancellationToken);
   public async Task RemoveAsync(Usuario usuario, CancellationToken cancellationToken = default)
   {
-      await _context.Usuarios.Where(u => u.Id == usuario.Id).ExecuteDeleteAsync(cancellationToken);
+      await _context.Usuarios.Where(u => u.Uuid == usuario.Uuid).ExecuteDeleteAsync(cancellationToken);
       await _context.SaveChangesAsync(cancellationToken);
   }
 

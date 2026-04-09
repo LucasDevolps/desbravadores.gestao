@@ -24,6 +24,6 @@ public sealed class CriarUsuarioHandler(IUsuarioRepository usuarioRepository)
     );
 
     await _usuarioRepository.AdicionarUsuarioAsync(usuario, cancellationToken);
-    return usuario.Id;
+    return usuario.Uuid;
   }
 }

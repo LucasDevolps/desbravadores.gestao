@@ -15,22 +15,32 @@ namespace Desbravadores.Gestao.Infrastructure.Data
 
         entity.HasKey(x => x.Id);
 
+        entity.HasIndex(x => x.Uuid)
+              .HasName("UuidIndex")
+              .IsUnique();
+
+        entity.Property(x => x.Id)
+              .ValueGeneratedOnAdd();
+
+        entity.Property(x => x.Uuid)
+              .IsRequired();
+
         entity.Property(x => x.Nome)
-            .IsRequired()
-            .HasMaxLength(150);
+              .IsRequired()
+              .HasMaxLength(150);
 
         entity.Property(x => x.Email)
-            .IsRequired()
-            .HasMaxLength(200);
+              .IsRequired()
+              .HasMaxLength(200);
 
         entity.Property(x => x.Senha)
-            .IsRequired();
+              .IsRequired();
 
         entity.Property(x => x.DataCriacao)
-            .IsRequired();
+              .IsRequired();
 
         entity.HasIndex(x => x.Email)
-            .IsUnique();
+              .IsUnique();
       });
     }
   }

@@ -28,11 +28,11 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
 
     var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
+            new(JwtRegisteredClaimNames.Sub, usuario.Uuid.ToString()),
             new(JwtRegisteredClaimNames.Email, usuario.Email),
             new(ClaimTypes.Name, usuario.Nome),
-            new(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-            new("uuid", usuario.Id.ToString())
+            new(ClaimTypes.NameIdentifier, usuario.Uuid.ToString()),
+            new("uuid", usuario.Uuid.ToString())
         };
 
     var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
