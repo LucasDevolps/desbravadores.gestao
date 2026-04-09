@@ -1,6 +1,6 @@
 ﻿using Desbravadores.Gestao.Application.Auth.Token;
 using Desbravadores.Gestao.Application.Interfaces;
-using Desbravadores.Gestao.Domain;
+using Desbravadores.Gestao.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,20 +11,18 @@ namespace Desbravadores.Gestao.Infrastructure.Security;
 
 public sealed class TokenService(IConfiguration configuration) : ITokenService
 {
-  private readonly IConfiguration _configuration = configuration;
-
   public Task<TokenResult> GenerateToken(Usuario usuario)
   {
-    var key = _configuration["Jwt:Key"]
-              ?? throw new InvalidOperationException("Jwt:Key não configurado.");
+    var key = Environment.GetEnvironmentVariable("JWT_KEY")
+              ?? throw new InvalidOperationException("JWT_KEY não configurado.");
 
-    var issuer = _configuration["Jwt:Issuer"]
-                 ?? throw new InvalidOperationException("Jwt:Issuer não configurado.");
+    var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
+                 ?? throw new InvalidOperationException("JWT_ISSUER não configurado.");
 
-    var audience = _configuration["Jwt:Audience"]
-                   ?? throw new InvalidOperationException("Jwt:Audience não configurado.");
+    var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+                   ?? throw new InvalidOperationException("JWT_AUDIENCE não configurado.");
 
-    var expiresInMinutes = int.TryParse(_configuration["Jwt:ExpiresInMinutes"], out var minutes)
+    var expiresInMinutes = int.TryParse(Environment.GetEnvironmentVariable("Jwt_ExpiresInMinutes"), out var minutes)
         ? minutes
         : 120;
 

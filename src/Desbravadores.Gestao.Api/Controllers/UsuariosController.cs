@@ -1,9 +1,11 @@
-﻿using Desbravadores.Gestao.Application;
+﻿using Desbravadores.Gestao.Application.Interfaces;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Desbravadores.Gestao.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public sealed class UsuariosController : ControllerBase

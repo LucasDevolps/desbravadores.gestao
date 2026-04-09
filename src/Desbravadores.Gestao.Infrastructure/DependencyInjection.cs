@@ -1,4 +1,4 @@
-﻿using Desbravadores.Gestao.Application;
+﻿using Desbravadores.Gestao.Application.Interfaces;
 using Desbravadores.Gestao.Infrastructure.Data;
 using Desbravadores.Gestao.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;

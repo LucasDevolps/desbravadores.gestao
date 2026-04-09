@@ -1,5 +1,6 @@
-﻿using Desbravadores.Gestao.Application;
-using Desbravadores.Gestao.Domain;
+﻿using Desbravadores.Gestao.Application.Interfaces;
+using Desbravadores.Gestao.Domain.DTOs;
+using Desbravadores.Gestao.Domain.Entities;
 using Desbravadores.Gestao.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +11,22 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
   private readonly AppDbContext _context = context;
 
   public async Task AdicionarUsuarioAsync(Usuario usuario, CancellationToken cancellationToken = default)
-    => await _context.Usuarios.AddAsync(usuario, cancellationToken);
+  {
+    await _context.Usuarios.AddAsync(usuario, cancellationToken);
+    await _context.SaveChangesAsync(cancellationToken);
+  }
 
-  public async Task<IEnumerable<Usuario>> GetAllAsync(CancellationToken cancellationToken = default)
-    => await _context.Usuarios.ToListAsync(cancellationToken);
+  public async Task<IEnumerable<UsuarioDTO>> GetAllAsync(CancellationToken cancellationToken = default)
+    => await _context.Usuarios
+        .Select(u => new UsuarioDTO
+        {
+            Id = u.Id,
+            Nome = u.Nome,
+            Email = u.Email,
+            DataCriacao = u.DataCriacao
+        })
+        .ToListAsync(cancellationToken);
+
   public async Task<Usuario?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
   {
     return await _context
@@ -21,15 +34,26 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
         .FirstOrDefaultAsync(x => x.Email.Equals(email.Trim().ToLowerInvariant()), cancellationToken);
   }
 
-  public async Task<Usuario?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-    => await _context.Usuarios.FindAsync(id, cancellationToken);
-
+  public async Task<UsuarioDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    => await _context.Usuarios
+        .Where(u => u.Id == id)
+        .Select(u => new UsuarioDTO
+        {
+            Id = u.Id,
+            Nome = u.Nome,
+            Email = u.Email,
+            DataCriacao = u.DataCriacao
+        })
+        .FirstOrDefaultAsync(cancellationToken);
   public async Task RemoveAsync(Usuario usuario, CancellationToken cancellationToken = default)
-    => await _context.Usuarios.Where(u => u.Id == usuario.Id).ExecuteDeleteAsync(cancellationToken);
-
-  public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
-    => await _context.SaveChangesAsync(cancellationToken);
+  {
+      await _context.Usuarios.Where(u => u.Id == usuario.Id).ExecuteDeleteAsync(cancellationToken);
+      await _context.SaveChangesAsync(cancellationToken);
+  }
 
   public async Task UpdateAsync(Usuario usuario, CancellationToken cancellationToken = default)
-    => throw new NotImplementedException("Ainda não existe update");
+  {
+    _context.Usuarios.Update(usuario);
+    await _context.SaveChangesAsync(cancellationToken);
+  }
 }

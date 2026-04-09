@@ -21,17 +21,16 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<LoginHandler>();
-builder.Services.AddScoped<LoginValidator>();
+builder.Services.AddScoped<LoginRequestValidator>();
 
-var jwtKey = builder.Configuration["Jwt:Key"]
-             ?? throw new InvalidOperationException("Jwt:Key não configurado.");
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
+             ?? throw new InvalidOperationException("JWT_KEY não configurado.");
 
-var jwtIssuer = builder.Configuration["Jwt:Issuer"]
-                ?? throw new InvalidOperationException("Jwt:Issuer não configurado.");
+var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
+                ?? throw new InvalidOperationException("JWT_ISSUER não configurado.");
 
-var jwtAudience = builder.Configuration["Jwt:Audience"]
-                  ?? throw new InvalidOperationException("Jwt:Audience não configurado.");
-
+var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+                  ?? throw new InvalidOperationException("JWT_AUDIENCE não configurado.");
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

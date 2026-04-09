@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNet.Identity;
-
-namespace Desbravadores.Gestao.Domain;
+﻿namespace Desbravadores.Gestao.Domain.Entities;
 
 public sealed class Usuario(string nome, string email, string senha)
 {

@@ -1,4 +1,4 @@
-﻿using Desbravadores.Gestao.Domain;
+﻿using Desbravadores.Gestao.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Desbravadores.Gestao.Infrastructure.Data

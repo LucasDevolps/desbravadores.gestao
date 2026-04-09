@@ -1,4 +1,6 @@
-﻿using Desbravadores.Gestao.Domain;
+﻿
+using Desbravadores.Gestao.Application.Interfaces;
+using Desbravadores.Gestao.Domain.Entities;
 
 namespace Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 
@@ -22,8 +24,6 @@ public sealed class CriarUsuarioHandler(IUsuarioRepository usuarioRepository)
     );
 
     await _usuarioRepository.AdicionarUsuarioAsync(usuario, cancellationToken);
-    await _usuarioRepository.SaveChangesAsync(cancellationToken);
-
     return usuario.Id;
   }
 }
