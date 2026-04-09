@@ -4,11 +4,11 @@ using Desbravadores.Gestao.Domain.Entities;
 
 namespace Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 
-public sealed class CriarUsuarioHandler(IUsuarioRepository usuarioRepository)
+public sealed class CriarUsuarioRequestHandler(IUsuarioRepository usuarioRepository)
 {
   private readonly IUsuarioRepository _usuarioRepository = usuarioRepository;
 
-  public async Task<Guid> HandleAsync(CriarUsuario command, CancellationToken cancellationToken = default)
+  public async Task<Guid> HandleAsync(CriarUsuarioRequest command, CancellationToken cancellationToken = default)
   {
     var usuarioExistente = await _usuarioRepository.GetByEmailAsync(command.Email, cancellationToken);
 
