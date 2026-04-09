@@ -1,6 +1,8 @@
-﻿namespace Desbravadores.Gestao.Domain.Entities;
+﻿using Desbravadores.Gestao.Domain.Constants;
 
-public sealed class Usuario(string nome, string email, string senha)
+namespace Desbravadores.Gestao.Domain.Entities;
+
+public sealed class Usuario(string nome, string email, string senha, string role)
 {
   public Guid Uuid { get; private set; } = Guid.NewGuid();
   public int Id { get; private set; } = default;
@@ -9,5 +11,8 @@ public sealed class Usuario(string nome, string email, string senha)
   public string Senha { get; private set; } = senha;
   public DateOnly DataCriacao { get; private set; } = DateOnly.MinValue;
 
+  public string Role { get; private set; } = role;
+
   public ICollection<UsuarioSessao> Sessoes { get; private set; } = [];
+
 }

@@ -10,7 +10,7 @@ public static class DependencyInjection
   public static IServiceCollection AddApplication(this IServiceCollection services)
   {
     services.AddScoped<CriarUsuarioHandler>();
-    services.AddScoped<LoginHandler>();
+    services.AddScoped<LoginRequestHandler>();
     services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
     return services;
   }

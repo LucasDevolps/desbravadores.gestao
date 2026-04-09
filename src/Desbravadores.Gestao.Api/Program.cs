@@ -1,6 +1,7 @@
 using Desbravadores.Gestao.Application;
 using Desbravadores.Gestao.Application.Auth.Login;
 using Desbravadores.Gestao.Application.Interfaces;
+using Desbravadores.Gestao.Domain.Constants;
 using Desbravadores.Gestao.Domain.Interfaces.Repositories;
 using Desbravadores.Gestao.Infrastructure;
 using Desbravadores.Gestao.Infrastructure.Repositories;
@@ -23,7 +24,7 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IUsuarioSessaoRepository, UsuarioSessaoRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-builder.Services.AddScoped<LoginHandler>();
+builder.Services.AddScoped<LoginRequestHandler>();
 builder.Services.AddScoped<LoginRequestValidator>();
 
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
@@ -51,7 +52,17 @@ builder.Services
       };
     });
 
+
+builder.Services.AddAuthorizationBuilder()
+  .AddPolicy("MasterOnly", policy =>
+      policy.RequireRole(Roles.DIRETORIA, Roles.SECRETARIA))
+  .AddPolicy("Financeiro", policy =>
+      policy.RequireRole(Roles.TESOURARIA, Roles.DIRETORIA, Roles.DIRETORIA));
+
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseSwagger();
 app.UseSwaggerUI();
