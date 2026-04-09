@@ -16,7 +16,6 @@ namespace Desbravadores.Gestao.Infrastructure.Data
         entity.HasKey(x => x.Id);
 
         entity.HasIndex(x => x.Uuid)
-              .HasName("UuidIndex")
               .IsUnique();
 
         entity.Property(x => x.Id)
