@@ -1,7 +1,9 @@
 using Desbravadores.Gestao.Application;
 using Desbravadores.Gestao.Application.Auth.Login;
 using Desbravadores.Gestao.Application.Interfaces;
+using Desbravadores.Gestao.Domain.Interfaces.Repositories;
 using Desbravadores.Gestao.Infrastructure;
+using Desbravadores.Gestao.Infrastructure.Repositories;
 using Desbravadores.Gestao.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +20,7 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IUsuarioSessaoRepository, UsuarioSessaoRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<LoginHandler>();

@@ -1,13 +1,17 @@
 ﻿using Desbravadores.Gestao.Application.Auth.Token;
 using Desbravadores.Gestao.Application.Interfaces;
+using Desbravadores.Gestao.Domain.Entities;
+using Desbravadores.Gestao.Domain.Interfaces.Repositories;
 
 namespace Desbravadores.Gestao.Application.Auth.Login;
 
 public sealed class LoginHandler(
     IUsuarioRepository usuarioRepository,
+    IUsuarioSessaoRepository usuarioSessaoRepository,
     ITokenService tokenService)
 {
   private readonly IUsuarioRepository _usuarioRepository = usuarioRepository;
+  private readonly IUsuarioSessaoRepository _usuarioSessaoRepository = usuarioSessaoRepository;
   private readonly ITokenService _tokenService = tokenService;
 
   public async Task<LoginResponse> HandleAsync(LoginRequest request, CancellationToken cancellationToken = default)
@@ -15,23 +19,23 @@ public sealed class LoginHandler(
     var usuario = await _usuarioRepository.GetByEmailAsync(request.Email, cancellationToken) 
     ?? throw new UnauthorizedAccessException("E-mail ou senha inválidos.");
 
+
     TokenResult token = await _tokenService.GenerateToken(usuario);
-    var expiracao = DateTime.UtcNow.AddMinutes(await GetExpirateTimeMinutes());
+
+    var sessao = new UsuarioSessao(
+      usuario.Id,
+      token.Jti,
+      token.RefreshToken,
+      token.AccessTokenExpiraEm,
+      token.RefreshTokenExpiraEm);
+
+    await _usuarioSessaoRepository.AddAsync(sessao, cancellationToken);
+    await _usuarioSessaoRepository.SaveChangesAsync(cancellationToken);
 
     return new LoginResponse(
-        Token: token,
-        Expiracao: expiracao,
-        Nome: usuario.Nome,
-        Email: usuario.Email
-    );
-  }
-  private static async Task<int> GetExpirateTimeMinutes()
-  {
-    var jwtExpiration = Environment.GetEnvironmentVariable("Jwt_ExpiresInMinutes");
-    if (int.TryParse(jwtExpiration, out int expirationMinutes))
-    {
-      return await Task.FromResult(expirationMinutes);
-    }
-    throw new InvalidOperationException("Jwt_ExpiresInMinutes não configurado ou inválido.");
+        token,
+        token.AccessTokenExpiraEm,
+        usuario.Nome,
+        usuario.Email);
   }
 }

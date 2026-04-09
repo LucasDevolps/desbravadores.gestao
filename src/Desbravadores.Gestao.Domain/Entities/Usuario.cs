@@ -8,4 +8,6 @@ public sealed class Usuario(string nome, string email, string senha)
   public string Email { get; private set; } = email;
   public string Senha { get; private set; } = senha;
   public DateOnly DataCriacao { get; private set; } = DateOnly.MinValue;
+
+  public ICollection<UsuarioSessao> Sessoes { get; private set; } = [];
 }
