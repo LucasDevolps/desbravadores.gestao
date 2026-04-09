@@ -1,6 +1,7 @@
 ﻿using Desbravadores.Gestao.Application.Interfaces;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 using Desbravadores.Gestao.Domain.Constants;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,21 +10,28 @@ namespace Desbravadores.Gestao.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public sealed class UsuariosController : ControllerBase
+public sealed class UsuariosController(IValidator<CriarUsuarioRequest> validator) : ControllerBase
 {
+  private readonly IValidator<CriarUsuarioRequest> _validator = validator;
+
   [Authorize(Policy = "MasterOnly")]
   [HttpPost("CriarUsuario")]
   public async Task<IActionResult> CriarUsuario(
-    [FromServices] CriarUsuarioHandler criarUsuarioHandler,
-    [FromBody] CriarUsuario request,
+    [FromServices] CriarUsuarioRequestHandler criarUsuarioHandler,
+    [FromBody] CriarUsuarioRequest request,
     CancellationToken cancellationToken = default
   )
   {
     if (!Roles.Validas.Contains(request.Roles.Trim()))
       return BadRequest("Role inválida.");
 
+    var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+      return BadRequest(validationResult.Errors);
+
     var id = await criarUsuarioHandler.HandleAsync(
-      new CriarUsuario
+      new CriarUsuarioRequest
       (
         request.Nome,
         request.Email,
