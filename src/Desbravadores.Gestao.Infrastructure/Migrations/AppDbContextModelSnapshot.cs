@@ -56,10 +56,79 @@ namespace Desbravadores.Gestao.Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("Uuid")
-                        .IsUnique()
-                        .HasDatabaseName("UuidIndex");
+                        .IsUnique();
 
                     b.ToTable("Usuarios", (string)null);
+                });
+
+            modelBuilder.Entity("Desbravadores.Gestao.Domain.Entities.UsuarioSessao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AccessTokenExpiraEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DataRevogacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Jti")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("RefreshTokenExpiraEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Revogado")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("Uuid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Uuid");
+
+                    b.HasIndex("Jti")
+                        .IsUnique();
+
+                    b.HasIndex("RefreshToken")
+                        .IsUnique();
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("UsuarioSessoes", (string)null);
+                });
+
+            modelBuilder.Entity("Desbravadores.Gestao.Domain.Entities.UsuarioSessao", b =>
+                {
+                    b.HasOne("Desbravadores.Gestao.Domain.Entities.Usuario", "Usuario")
+                        .WithMany("Sessoes")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("Desbravadores.Gestao.Domain.Entities.Usuario", b =>
+                {
+                    b.Navigation("Sessoes");
                 });
 #pragma warning restore 612, 618
         }

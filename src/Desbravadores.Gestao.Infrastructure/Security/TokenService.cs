@@ -1,54 +1,61 @@
 ﻿using Desbravadores.Gestao.Application.Auth.Token;
 using Desbravadores.Gestao.Application.Interfaces;
 using Desbravadores.Gestao.Domain.Entities;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Desbravadores.Gestao.Infrastructure.Security;
 
-public sealed class TokenService(IConfiguration configuration) : ITokenService
+public sealed class TokenService : ITokenService
 {
   public Task<TokenResult> GenerateToken(Usuario usuario)
   {
-    var key = Environment.GetEnvironmentVariable("JWT_KEY")
-              ?? throw new InvalidOperationException("JWT_KEY não configurado.");
+      var jwtKey = Environment.GetEnvironmentVariable("Jwt_Key")
+          ?? throw new InvalidOperationException("Jwt:Key não configurado.");
 
-    var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
-                 ?? throw new InvalidOperationException("JWT_ISSUER não configurado.");
+      var issuer = Environment.GetEnvironmentVariable("Jwt_Issuer") 
+          ?? throw new InvalidOperationException("Jwt:Issuer não configurado.");
 
-    var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
-                   ?? throw new InvalidOperationException("JWT_AUDIENCE não configurado.");
+      var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+          ?? throw new InvalidOperationException("Jwt:Audience não configurado.");
 
-    var expiresInMinutes = int.TryParse(Environment.GetEnvironmentVariable("Jwt_ExpiresInMinutes"), out var minutes)
-        ? minutes
-        : 120;
+      var accessTokenMinutes = int.TryParse(Environment.GetEnvironmentVariable("Jwt_ExpiresInMinutes"), out var atm) ? atm : 60;
+      var refreshTokenDays = int.TryParse(Environment.GetEnvironmentVariable("Jwt_RefreshTokenDays"), out var rtd) ? rtd : 7;
+      var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+      var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-    var claims = new List<Claim>
-        {
-            new(JwtRegisteredClaimNames.Sub, usuario.Uuid.ToString()),
-            new(JwtRegisteredClaimNames.Email, usuario.Email),
-            new(ClaimTypes.Name, usuario.Nome),
-            new(ClaimTypes.NameIdentifier, usuario.Uuid.ToString()),
-            new("uuid", usuario.Uuid.ToString())
-        };
+      var jti = Guid.NewGuid().ToString();
+      var accessTokenExpires = DateTime.UtcNow.AddMinutes(accessTokenMinutes);
+      var refreshTokenExpires = DateTime.UtcNow.AddDays(refreshTokenDays);
 
-    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-    var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+      var claims = new List<Claim>
+    {
+      new(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
+      new(JwtRegisteredClaimNames.Email, usuario.Email),
+      new(JwtRegisteredClaimNames.Jti, jti),
+      new("uid", usuario.Uuid.ToString()),
+      new(ClaimTypes.Name, usuario.Nome)
+    };
 
-    var token = new JwtSecurityToken(
-        issuer: issuer,
-        audience: audience,
-        claims: claims,
-        expires: DateTime.UtcNow.AddMinutes(expiresInMinutes),
-        signingCredentials: credentials
-    );
+      var token = new JwtSecurityToken(
+          issuer: issuer,
+          audience: audience,
+          claims: claims,
+          expires: accessTokenExpires,
+          signingCredentials: credentials);
 
-    return Task.FromResult(new TokenResult(
-        AccessToken: new JwtSecurityTokenHandler().WriteToken(token),
-        ExpiresAtUtc: token.ValidTo
-    ));
-  }
+      var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
+      var refreshToken = GenerateRefreshToken();
+
+      return Task.FromResult(new TokenResult(accessToken, refreshToken, jti, accessTokenExpires, refreshTokenExpires));
+    }
+
+    private static string GenerateRefreshToken()
+    {
+      var randomBytes = RandomNumberGenerator.GetBytes(64);
+      return Convert.ToBase64String(randomBytes);
+    }
 }

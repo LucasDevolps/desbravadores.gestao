@@ -6,6 +6,7 @@ namespace Desbravadores.Gestao.Infrastructure.Data
   public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
   {
     public DbSet<Usuario> Usuarios => Set<Usuario>();
+    public DbSet<UsuarioSessao> UsuarioSessoes => Set<UsuarioSessao>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -40,6 +41,46 @@ namespace Desbravadores.Gestao.Infrastructure.Data
 
         entity.HasIndex(x => x.Email)
               .IsUnique();
+      });
+
+      modelBuilder.Entity<UsuarioSessao>(entity =>
+      {
+        entity.ToTable("UsuarioSessoes");
+
+        entity.HasKey(x => x.Id);
+
+        entity.HasAlternateKey(x => x.Uuid);
+
+        entity.Property(x => x.Jti)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        entity.Property(x => x.RefreshToken)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        entity.Property(x => x.AccessTokenExpiraEm)
+            .IsRequired();
+
+        entity.Property(x => x.RefreshTokenExpiraEm)
+            .IsRequired();
+
+        entity.Property(x => x.Revogado)
+            .IsRequired();
+
+        entity.Property(x => x.DataCriacao)
+            .IsRequired();
+
+        entity.HasIndex(x => x.Jti)
+            .IsUnique();
+
+        entity.HasIndex(x => x.RefreshToken)
+            .IsUnique();
+
+        entity.HasOne(x => x.Usuario)
+            .WithMany(x => x.Sessoes)
+            .HasForeignKey(x => x.UsuarioId)
+            .OnDelete(DeleteBehavior.Cascade);
       });
     }
   }

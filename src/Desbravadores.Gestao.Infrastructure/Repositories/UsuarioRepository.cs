@@ -29,10 +29,6 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
 
   public async Task<Usuario?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
   {
-    if (email is "teste@teste.com")
-      return new Usuario("Teste", email, "string");
-
-
     return await _context
         .Usuarios
         .FirstOrDefaultAsync(x => x.Email.Equals(email.Trim().ToLowerInvariant()), cancellationToken);
