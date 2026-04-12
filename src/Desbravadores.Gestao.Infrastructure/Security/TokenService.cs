@@ -32,16 +32,16 @@ public sealed class TokenService : ITokenService
       var refreshTokenExpires = DateTime.UtcNow.AddDays(refreshTokenDays);
 
       var claims = new List<Claim>
-    {
-      new(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
-      new(JwtRegisteredClaimNames.Email, usuario.Email),
-      new(JwtRegisteredClaimNames.Jti, jti),
-      new("uid", usuario.Uuid.ToString()),
-      new(ClaimTypes.Name, usuario.Nome),
-      new(ClaimTypes.Role, usuario.Role)
-    };
+      {
+        new(JwtRegisteredClaimNames.Sub, usuario.Uuid.ToString()),
+        new(JwtRegisteredClaimNames.Email, usuario.Email),
+        new(JwtRegisteredClaimNames.Jti, jti),
+        new("user_id", usuario.Id.ToString()),
+        new(ClaimTypes.Name, usuario.Nome),
+        new(ClaimTypes.Role, usuario.Role)
+      };
 
-      var token = new JwtSecurityToken(
+    var token = new JwtSecurityToken(
           issuer: issuer,
           audience: audience,
           claims: claims,

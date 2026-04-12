@@ -1,10 +1,11 @@
 ﻿using Desbravadores.Gestao.Application.Auth.Login;
+using Desbravadores.Gestao.Application.Interfaces;
 using Desbravadores.Gestao.Domain.Interfaces.Repositories;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
-using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace Desbravadores.Gestao.Api.Controllers;
 
@@ -52,5 +53,23 @@ public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
     await usuarioSessaoRepository.SaveChangesAsync(cancellationToken);
 
     return NoContent();
+  }
+  [Authorize]
+  [HttpGet("me")]
+  public async Task<IActionResult> Me(
+  [FromServices] IUsuarioRepository usuarioRepository,
+  CancellationToken cancellationToken)
+  {
+    var uuidValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    if (!Guid.TryParse(uuidValue, out var uuid))
+      return Unauthorized("Token inválido: UUID não encontrado.");
+
+    var usuario = await usuarioRepository.GetByUuidAsync(uuid, cancellationToken);
+
+    if (usuario is null)
+      return NotFound("Usuário não encontrado.");
+
+    return Ok(usuario);
   }
 }

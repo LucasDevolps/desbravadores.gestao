@@ -7,6 +7,7 @@ public interface IUsuarioRepository
 {
     Task<Usuario?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<UsuarioDTO?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<Usuario?> GetByUuidAsync(Guid uuid, CancellationToken cancellationToken = default);
     Task AdicionarUsuarioAsync(Usuario usuario, CancellationToken cancellationToken = default);
     Task<IEnumerable<UsuarioDTO>> GetAllAsync(CancellationToken cancellationToken = default);
     Task RemoveAsync(Usuario usuario, CancellationToken cancellationToken = default);

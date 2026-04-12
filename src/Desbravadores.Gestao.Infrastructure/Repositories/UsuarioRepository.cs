@@ -45,6 +45,13 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
             DataCriacao = u.DataCriacao
         })
         .FirstOrDefaultAsync(cancellationToken);
+
+  public async Task<Usuario?> GetByUuidAsync(Guid uuid, CancellationToken cancellationToken = default)
+  {
+    return await _context
+        .Usuarios
+        .FirstOrDefaultAsync(x => x.Uuid == uuid, cancellationToken);
+  }
   public async Task RemoveAsync(Usuario usuario, CancellationToken cancellationToken = default)
   {
       await _context.Usuarios.Where(u => u.Uuid == usuario.Uuid).ExecuteDeleteAsync(cancellationToken);
