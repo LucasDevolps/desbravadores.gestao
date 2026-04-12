@@ -7,17 +7,14 @@ using Desbravadores.Gestao.Infrastructure;
 using Desbravadores.Gestao.Infrastructure.Repositories;
 using Desbravadores.Gestao.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
@@ -37,24 +34,56 @@ var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
 
 var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
                   ?? throw new InvalidOperationException("JWT_AUDIENCE não configurado.");
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-      options.TokenValidationParameters = new TokenValidationParameters
-      {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateIssuerSigningKey = true,
-        ValidateLifetime = true,
-        ValidIssuer = jwtIssuer,
-        ValidAudience = jwtAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-        ClockSkew = TimeSpan.Zero,
-        RoleClaimType = ClaimTypes.Role,
-      };
-    });
 
+builder.Services
+  .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+  .AddJwtBearer(options =>
+  {
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+      ValidateIssuer = true,
+      ValidateAudience = true,
+      ValidateLifetime = true,
+      ValidateIssuerSigningKey = true,
+      ValidIssuer = jwtIssuer,
+      ValidAudience = jwtAudience,
+      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+  });
+
+builder.Services.AddSwaggerGen(options =>
+{
+  options.SwaggerDoc("v1", new OpenApiInfo
+  {
+    Title = "Desbravadores.Gestao.Api",
+    Version = "v1"
+  });
+
+  options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+  {
+    Name = "Authorization",
+    Type = SecuritySchemeType.Http,
+    Scheme = "bearer",
+    BearerFormat = "JWT",
+    In = ParameterLocation.Header,
+    Description = "Informe o token JWT no formato: Bearer {seu_token}"
+  });
+
+  options.AddSecurityRequirement(new OpenApiSecurityRequirement
+  {
+    {
+      new OpenApiSecurityScheme
+      {
+        Reference = new OpenApiReference
+        {
+          Type = ReferenceType.SecurityScheme,
+          Id = "Bearer"
+        }
+      },
+      Array.Empty<string>()
+    }
+  });
+});
 
 builder.Services.AddAuthorizationBuilder()
   .AddPolicy("MasterOnly", policy =>
@@ -68,13 +97,14 @@ builder.Services.AddAuthorizationBuilder()
 
 var app = builder.Build();
 
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

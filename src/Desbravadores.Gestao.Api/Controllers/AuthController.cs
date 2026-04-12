@@ -5,7 +5,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
-using System.Security.Claims;
 
 namespace Desbravadores.Gestao.Api.Controllers;
 
@@ -17,6 +16,7 @@ public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
 
   [HttpPost("login")]
   [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+  [ProducesResponseType(StatusCodes.Status400BadRequest)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   public async Task<IActionResult> Login(
       [FromServices] LoginRequestHandler loginRequestHandler,
@@ -26,20 +26,21 @@ public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
     var validationResult = await _validator.ValidateAsync(request, cancellationToken);
 
     if (!validationResult.IsValid)
-    {
       return BadRequest(validationResult.Errors);
-    }
 
     var response = await loginRequestHandler.HandleAsync(request, cancellationToken);
     return Ok(response);
   }
+
   [Authorize]
   [HttpPost("logout")]
+  [ProducesResponseType(StatusCodes.Status204NoContent)]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   public async Task<IActionResult> Logout(
     [FromServices] IUsuarioSessaoRepository usuarioSessaoRepository,
     CancellationToken cancellationToken)
   {
-    var jti = User.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)?.Value;
+    var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
 
     if (string.IsNullOrWhiteSpace(jti))
       return Unauthorized();
@@ -54,13 +55,17 @@ public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
 
     return NoContent();
   }
+
   [Authorize]
-  [HttpGet("me")]
+  [HttpGet("Me")]
+  [ProducesResponseType(StatusCodes.Status200OK)]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
   public async Task<IActionResult> Me(
-  [FromServices] IUsuarioRepository usuarioRepository,
-  CancellationToken cancellationToken)
+    [FromServices] IUsuarioRepository usuarioRepository,
+    CancellationToken cancellationToken)
   {
-    var uuidValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var uuidValue = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
     if (!Guid.TryParse(uuidValue, out var uuid))
       return Unauthorized("Token inválido: UUID não encontrado.");
