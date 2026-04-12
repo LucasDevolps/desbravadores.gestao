@@ -13,14 +13,14 @@ public sealed class TokenService : ITokenService
 {
   public Task<TokenResult> GenerateToken(Usuario usuario)
   {
-      var jwtKey = Environment.GetEnvironmentVariable("Jwt_Key")
-          ?? throw new InvalidOperationException("Jwt:Key não configurado.");
+      var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
+          ?? throw new InvalidOperationException("JWT_KEY não configurado.");
 
-      var issuer = Environment.GetEnvironmentVariable("Jwt_Issuer") 
-          ?? throw new InvalidOperationException("Jwt:Issuer não configurado.");
+      var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") 
+          ?? throw new InvalidOperationException("JWT_ISSUER não configurado.");
 
       var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
-          ?? throw new InvalidOperationException("Jwt:Audience não configurado.");
+          ?? throw new InvalidOperationException("JWT_AUDIENCE não configurado.");
 
       var accessTokenMinutes = int.TryParse(Environment.GetEnvironmentVariable("Jwt_ExpiresInMinutes"), out var atm) ? atm : 60;
       var refreshTokenDays = int.TryParse(Environment.GetEnvironmentVariable("Jwt_RefreshTokenDays"), out var rtd) ? rtd : 7;
