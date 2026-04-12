@@ -7,7 +7,9 @@ using Desbravadores.Gestao.Infrastructure;
 using Desbravadores.Gestao.Infrastructure.Repositories;
 using Desbravadores.Gestao.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,16 +50,21 @@ builder.Services
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.Zero,
+        RoleClaimType = ClaimTypes.Role,
       };
     });
 
 
 builder.Services.AddAuthorizationBuilder()
   .AddPolicy("MasterOnly", policy =>
-      policy.RequireRole(Roles.DIRETORIA, Roles.SECRETARIA))
+      policy.RequireRole(
+          Role.DIRETORIA.ToString(),
+          Role.SECRETARIA.ToString()))
   .AddPolicy("Financeiro", policy =>
-      policy.RequireRole(Roles.TESOURARIA, Roles.DIRETORIA, Roles.DIRETORIA));
+      policy.RequireRole(
+          Role.TESOURARIA.ToString(),
+          Role.DIRETORIA.ToString()));
 
 var app = builder.Build();
 

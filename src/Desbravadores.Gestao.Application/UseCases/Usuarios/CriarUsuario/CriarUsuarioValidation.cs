@@ -20,6 +20,8 @@ public sealed class CriarUsuarioValidation : AbstractValidator<CriarUsuarioReque
         .WithMessage("A senha é obrigatória.");
     RuleFor(x => x.Roles)
         .NotEmpty()
-        .WithMessage("A role é obrigatória.");
+        .IsInEnum()
+        .WithMessage("A role é obrigatória e precisa ser um campo válido.");
+
   }
 }

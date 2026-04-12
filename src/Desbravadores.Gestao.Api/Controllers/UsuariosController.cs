@@ -22,9 +22,6 @@ public sealed class UsuariosController(IValidator<CriarUsuarioRequest> validator
     CancellationToken cancellationToken = default
   )
   {
-    if (!Roles.Validas.Contains(request.Roles.Trim()))
-      return BadRequest("Role inválida.");
-
     var validationResult = await _validator.ValidateAsync(request, cancellationToken);
 
     if (!validationResult.IsValid)
