@@ -65,7 +65,8 @@ public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
     [FromServices] IUsuarioRepository usuarioRepository,
     CancellationToken cancellationToken)
   {
-    var uuidValue = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+    var uuidValue = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+        ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
     if (!Guid.TryParse(uuidValue, out var uuid))
       return Unauthorized("Token inválido: UUID não encontrado.");

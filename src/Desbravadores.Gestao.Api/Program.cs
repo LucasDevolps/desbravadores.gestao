@@ -1,3 +1,4 @@
+using Desbravadores.Gestao.Api.Security;
 using Desbravadores.Gestao.Application;
 using Desbravadores.Gestao.Application.Auth.Login;
 using Desbravadores.Gestao.Application.Interfaces;
@@ -26,30 +27,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<LoginRequestHandler>();
 builder.Services.AddScoped<LoginRequestValidator>();
 
-var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
-             ?? throw new InvalidOperationException("JWT_KEY não configurado.");
 
-var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
-                ?? throw new InvalidOperationException("JWT_ISSUER não configurado.");
-
-var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
-                  ?? throw new InvalidOperationException("JWT_AUDIENCE não configurado.");
-
-builder.Services
-  .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-  .AddJwtBearer(options =>
-  {
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-      ValidateIssuer = true,
-      ValidateAudience = true,
-      ValidateLifetime = true,
-      ValidateIssuerSigningKey = true,
-      ValidIssuer = jwtIssuer,
-      ValidAudience = jwtAudience,
-      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
-    };
-  });
+builder.Services.AddJwtAuthentication();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -85,15 +64,7 @@ builder.Services.AddSwaggerGen(options =>
   });
 });
 
-builder.Services.AddAuthorizationBuilder()
-  .AddPolicy("MasterOnly", policy =>
-      policy.RequireRole(
-          Role.DIRETORIA.ToString(),
-          Role.SECRETARIA.ToString()))
-  .AddPolicy("Financeiro", policy =>
-      policy.RequireRole(
-          Role.TESOURARIA.ToString(),
-          Role.DIRETORIA.ToString()));
+builder.Services.AddAuthorizationBuilder().AddPolicies();
 
 var app = builder.Build();
 
