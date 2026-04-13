@@ -61,3 +61,4 @@ src/Desbravadores.Gestao.Api/dotnet-tools.json
 src/Desbravadores.Gestao.Api/Properties/PublishProfiles/
 src/Desbravadores.Gestao.Api/Desbravadores.Gestao.Api.csproj.user
 *.Api.csproj.user
+src/Desbravadores.Gestao.Infrastructure/DependencyInjection.cs
