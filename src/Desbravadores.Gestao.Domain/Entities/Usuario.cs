@@ -9,7 +9,7 @@ public sealed class Usuario(string nome, string email, string senha, string role
   public string Nome { get; private set; } = nome;
   public string Email { get; private set; } = email;
   public string Senha { get; private set; } = senha;
-  public DateOnly DataCriacao { get; private set; } = DateOnly.MinValue;
+  public DateOnly DataCriacao { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow);
 
   public string Role { get; private set; } = role;
 
