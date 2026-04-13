@@ -11,7 +11,7 @@ public static class DependencyInjection
   public static IServiceCollection AddInfrastructure(this IServiceCollection services)
   {
     services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(
+        options.UseNpgsql(
           Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
           ?? throw new InvalidOperationException("Connection string 'DefaultConnection' não configurada."))
         );
