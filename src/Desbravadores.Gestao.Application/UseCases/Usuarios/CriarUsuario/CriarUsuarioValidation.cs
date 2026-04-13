@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Desbravadores.Gestao.Domain.Constants;
+using FluentValidation;
 
 namespace Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 
@@ -19,9 +20,9 @@ public sealed class CriarUsuarioValidation : AbstractValidator<CriarUsuarioReque
         .NotNull()
         .WithMessage("A senha é obrigatória.");
     RuleFor(x => x.Roles)
-        .NotEmpty()
-        .IsInEnum()
-        .WithMessage("A role é obrigatória e precisa ser um campo válido.");
+    .NotEmpty()
+    .Must(role => Enum.TryParse(typeof(Role), role, true, out _))
+    .WithMessage("Role inválida.");
 
   }
 }
