@@ -12,10 +12,12 @@ public static class DependencyInjection
   {
     services.AddDbContext<AppDbContext>(options =>
         options.UseSqlServer(
-          Environment.GetEnvironmentVariable("DefaultConnectionDesbravadores") 
-          ?? throw new NotImplementedException("Instancia não encontrada"))
+          Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+          ?? throw new InvalidOperationException("Connection string 'DefaultConnection' não configurada."))
         );
+
     services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+
     return services;
   }
 }

@@ -69,4 +69,28 @@ public sealed class UsuariosController(IValidator<CriarUsuarioRequest> validator
 
     return Ok(usuario);
   }
+  
+  [AllowAnonymous]
+  [HttpPost("publicos")]
+  [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
+  [ProducesResponseType(StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  [ProducesResponseType(StatusCodes.Status403Forbidden)]
+  public async Task<IActionResult> CriarUsuarioPublicos(
+    [FromServices] CriarUsuarioRequestHandler criarUsuarioHandler,
+    [FromBody] CriarUsuarioRequest request,
+    CancellationToken cancellationToken = default)
+  {
+    var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+
+    if (!validationResult.IsValid)
+      return BadRequest(validationResult.Errors);
+
+    var id = await criarUsuarioHandler.HandleAsync(request, cancellationToken);
+
+    return CreatedAtAction(
+      nameof(ObterPorId),
+      new { id },
+      new { id });
+  }
 }

@@ -2,15 +2,12 @@ using Desbravadores.Gestao.Api.Security;
 using Desbravadores.Gestao.Application;
 using Desbravadores.Gestao.Application.Auth.Login;
 using Desbravadores.Gestao.Application.Interfaces;
-using Desbravadores.Gestao.Domain.Constants;
 using Desbravadores.Gestao.Domain.Interfaces.Repositories;
 using Desbravadores.Gestao.Infrastructure;
+using Desbravadores.Gestao.Infrastructure.Data;
 using Desbravadores.Gestao.Infrastructure.Repositories;
 using Desbravadores.Gestao.Infrastructure.Security;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +19,10 @@ builder.Services
           new System.Text.Json.Serialization.JsonStringEnumConverter()
       );
     });
+    
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddApplication();
@@ -74,6 +75,12 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddAuthorizationBuilder().AddPolicies();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+}
 
 app.UseSwagger();
 app.UseSwaggerUI();

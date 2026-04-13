@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: desbravadores_sql
+    environment:
+      SA_PASSWORD: "Bkur6etc@10"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: desbravadores_api
+    depends_on:
+      - sqlserver
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      JWT_KEY: "YxsbP0AvSKylRB9nQQ27V16R30pzwpMJZFQaAc5jAdD"
+      JWT_ISSUER: "Desbravadores.Gestao"
+      JWT_AUDIENCE: "Desbravadores.Gestao.Web"
+      Jwt_ExpiresInMinutes: "120"
+      Jwt_RefreshTokenDays: "7"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=DesbravadoresDb;User Id=sa;Password=Bkur6etc@10;TrustServerCertificate=True;" 
+    ports:
+      - "8080:10000"
+
+volumes:
+  sql_data:
