@@ -16,12 +16,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Login no GHCR
-        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
       - name: Set lowercase repo name
         id: repo
         run: echo "repo=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
+      - name: Login no GHCR
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build da imagem
         run: |
@@ -31,4 +31,4 @@ jobs:
 
       - name: Push da imagem
         run: |
-          docker push ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ steps.repo.outputs.repo }}:latest
