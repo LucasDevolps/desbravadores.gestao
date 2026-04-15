@@ -1,5 +1,4 @@
-﻿using Desbravadores.Gestao.Application.Common;
-using Desbravadores.Gestao.Application.UseCases.Usuarios.BuscaPorId;
+﻿using Desbravadores.Gestao.Application.UseCases.Usuarios.BuscaPorId;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.GetAll;
 using Desbravadores.Gestao.Domain.DTOs;

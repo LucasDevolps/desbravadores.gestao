@@ -2,9 +2,9 @@
 
 namespace Desbravadores.Gestao.Application.Auth.Login;
 
-public sealed class LoginRequestValidator : AbstractValidator<LoginRequestQuery>
+public sealed class LoginCommandValidator : AbstractValidator<LoginCommand>
 {
-  public LoginRequestValidator()
+  public LoginCommandValidator()
   {
     RuleFor(x => x.Email.ToLowerInvariant())
     .NotEmpty().WithMessage("O e-mail é obrigatório.")

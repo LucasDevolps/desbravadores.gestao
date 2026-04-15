@@ -3,7 +3,7 @@
 namespace Desbravadores.Gestao.Application.Auth.Login;
 
 public sealed record LoginResponse(
-    TokenResult  Token,
+    TokenResult Token,
     DateTime Expiracao,
     string Nome,
     string Email

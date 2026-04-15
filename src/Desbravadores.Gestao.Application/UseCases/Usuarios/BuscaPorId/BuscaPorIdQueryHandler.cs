@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Desbravadores.Gestao.Application.UseCases.Usuarios.BuscaPorId;
 
-public class BuscaPorIdRequestHandler(IUsuarioRepository usuarioRepository) : IRequestHandler<BuscaUsuarioPorIdQuery, UsuarioDTO>
+public class BuscaPorIdQueryHandler(IUsuarioRepository usuarioRepository) : IRequestHandler<BuscaUsuarioPorIdQuery, UsuarioDTO>
 {
   private readonly IUsuarioRepository usuarioRepository = usuarioRepository;
 

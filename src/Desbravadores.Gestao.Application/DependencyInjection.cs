@@ -16,8 +16,8 @@ public static class DependencyInjection
     services.AddScoped<IValidator<CriarUsuarioCommand>, CriarUsuarioCommandValidator>();
     services.AddScoped<CriarUsuarioCommandHandler>();
     
-    services.AddScoped<IValidator<LoginRequestQuery>, LoginRequestValidator>();
-    services.AddScoped<LoginRequestQueryHandler>();
+    services.AddScoped<IValidator<LoginCommand>, LoginCommandValidator>();
+    services.AddScoped<LoginCommandHandler>();
     
     services.AddScoped<LogoutRequestCommandHandler>();
     services.AddScoped<MeQueryHandler>();
@@ -26,8 +26,9 @@ public static class DependencyInjection
     services.AddScoped<IValidator<MeQuery>, MeQueryValidator>();
 
     services.AddScoped<GetAllUsuariosQueryHandler>();
-    services.AddScoped<BuscaPorIdRequestHandler>();
+    services.AddScoped<BuscaPorIdQueryHandler>();
 
+    services.AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
     return services;
   }
 }
