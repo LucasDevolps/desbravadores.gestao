@@ -62,3 +62,4 @@ src/Desbravadores.Gestao.Api/Properties/PublishProfiles/
 src/Desbravadores.Gestao.Api/Desbravadores.Gestao.Api.csproj.user
 *.Api.csproj.user
 src/Desbravadores.Gestao.Infrastructure/DependencyInjection.cs
+src/Desbravadores.Gestao.Api/Program.cs
