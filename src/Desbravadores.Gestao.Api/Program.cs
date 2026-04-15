@@ -24,6 +24,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IUsuarioSessaoRepository, UsuarioSessaoRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddScoped<LoginCommandHandler>();
+builder.Services.AddScoped<LoginCommandValidator>();
+
       builder.Services.AddMediatR(cfg =>
       {
         cfg.RegisterServicesFromAssembly(typeof(ApplicationAssemblyReference).Assembly);
