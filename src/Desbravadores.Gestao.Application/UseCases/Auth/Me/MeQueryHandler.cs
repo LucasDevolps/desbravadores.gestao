@@ -24,7 +24,7 @@ public sealed class MeQueryHandler(
       throw new UnauthorizedAccessException("Token inválido: JTI não encontrado.");
 
     var usuario = await _usuarioRepository.GetByUuidAsync(uuid, cancellationToken) 
-      ?? throw new Exception("Usuário não encontrado.");
+      ?? throw new KeyNotFoundException("Usuário não encontrado.");
     
       var tokenValido = await _usuarioSessaoRepository.ExistsActiveSessionAsync(
         usuario.Id,
