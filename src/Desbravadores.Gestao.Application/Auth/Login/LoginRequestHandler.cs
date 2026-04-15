@@ -25,6 +25,8 @@ public sealed class LoginRequestHandler(
 
     if (!senhaValida)
       throw new UnauthorizedAccessException("E-mail ou senha inválidos.");
+    
+    await _usuarioSessaoRepository.RevokeAllActiveByUsuarioIdAsync(usuario.Id, cancellationToken);
 
     TokenResult token = await _tokenService.GenerateToken(usuario);
 
