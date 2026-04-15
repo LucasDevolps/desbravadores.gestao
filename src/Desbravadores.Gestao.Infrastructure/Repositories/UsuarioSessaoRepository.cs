@@ -26,6 +26,7 @@ public sealed class UsuarioSessaoRepository(AppDbContext context) : IUsuarioSess
         .Include(x => x.Usuario)
         .FirstOrDefaultAsync(x => x.RefreshToken == refreshToken, cancellationToken);
   }
+<<<<<<< HEAD
   public async Task RevokeAllActiveByUsuarioIdAsync(long usuarioId, CancellationToken cancellationToken = default)
   {
     var agora = DateTime.UtcNow;
@@ -46,6 +47,8 @@ public sealed class UsuarioSessaoRepository(AppDbContext context) : IUsuarioSess
     CancellationToken cancellationToken = default)
   {
     var agora = DateTime.UtcNow;
+=======
+>>>>>>> parent of 7a4b8d1 (Revoga sessões ativas do usuário ao realizar login)
 
     return await _context.UsuarioSessoes
         .AnyAsync(x =>
