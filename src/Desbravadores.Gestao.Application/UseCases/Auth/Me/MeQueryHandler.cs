@@ -1,18 +1,19 @@
 ﻿using Desbravadores.Gestao.Application.Interfaces;
 using Desbravadores.Gestao.Domain.DTOs;
 using Desbravadores.Gestao.Domain.Interfaces.Repositories;
+using MediatR;
 
 namespace Desbravadores.Gestao.Application.UseCases.Auth.Me;
 
-public sealed class MeRequestHandler(
+public sealed class MeQueryHandler(
   IUsuarioSessaoRepository usuarioSessaoRepository,
   IUsuarioRepository usuarioRepository)
-  :IAppRequestHandler<MeRequest, UsuarioDTO>
+  :IRequestHandler<MeQuery, UsuarioDTO>
 {
   private readonly IUsuarioSessaoRepository _usuarioSessaoRepository = usuarioSessaoRepository;
   private readonly IUsuarioRepository _usuarioRepository = usuarioRepository;
 
-  public async Task<UsuarioDTO> HandleAsync(MeRequest request, CancellationToken cancellationToken = default)
+  public async Task<UsuarioDTO> Handle(MeQuery request, CancellationToken cancellationToken = default)
   {
     var uuidValue = request.Sub;
 

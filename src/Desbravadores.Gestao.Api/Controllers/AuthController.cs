@@ -2,6 +2,7 @@
 using Desbravadores.Gestao.Application.Auth.Logout;
 using Desbravadores.Gestao.Application.UseCases.Auth.Me;
 using Desbravadores.Gestao.Domain.DTOs;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -10,22 +11,20 @@ namespace Desbravadores.Gestao.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : BaseController
+public class AuthController(IMediator mediator) : Controller
 {
+  private readonly IMediator _mediator = mediator;
 
   [HttpPost("login")]
   [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
   [ProducesResponseType(StatusCodes.Status400BadRequest)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   public async Task<IActionResult> Login(
-      [FromServices] LoginRequestHandler loginRequestHandler,
-      [FromBody] LoginRequest request,
+      [FromBody] LoginRequestQuery command,
       CancellationToken cancellationToken)
   {
-    return await ExecuteAsync(
-        request,
-        loginRequestHandler,
-        cancellationToken);
+    var response = await _mediator.Send(command, cancellationToken);
+    return Ok(response);
   }
 
   [Authorize]
@@ -33,12 +32,13 @@ public class AuthController : BaseController
   [ProducesResponseType(StatusCodes.Status204NoContent)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   public async Task<IActionResult> Logout(
-    [FromServices] LogoutRequestHandler handler,
     CancellationToken cancellationToken)
   {
     var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty;
 
-    return await ExecuteNoContentAsync(jti, handler, cancellationToken);
+    await _mediator.Send(new LogoutCommand(jti), cancellationToken);
+
+    return NoContent();
   }
 
   [Authorize]
@@ -47,19 +47,17 @@ public class AuthController : BaseController
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
   public async Task<IActionResult> Me(
-    [FromServices] MeRequestHandler handler,
     CancellationToken cancellationToken)
   {
     var sub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
-              ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+              ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
+              ?? string.Empty;
 
-    var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+    var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value
+              ?? string.Empty;
 
-    if (string.IsNullOrWhiteSpace(sub) || string.IsNullOrWhiteSpace(jti))
-      return Unauthorized("Token inválido.");
+    var response = await _mediator.Send(new MeQuery(sub, jti), cancellationToken);
 
-    var request = new MeRequest(sub, jti);
-
-    return await ExecuteAsync(request, handler, cancellationToken);
+    return Ok(response);
   }
 }

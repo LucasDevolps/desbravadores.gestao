@@ -2,7 +2,7 @@
 
 namespace Desbravadores.Gestao.Application.Auth.Login;
 
-public sealed class LoginRequestValidator : AbstractValidator<LoginRequest>
+public sealed class LoginRequestValidator : AbstractValidator<LoginRequestQuery>
 {
   public LoginRequestValidator()
   {

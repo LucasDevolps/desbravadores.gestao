@@ -4,15 +4,15 @@ using MediatR;
 
 namespace Desbravadores.Gestao.Application.Auth.Logout;
 
-public sealed class LogoutRequestHandler(IUsuarioSessaoRepository usuarioSessaoRepository) :IAppRequestHandler<string, Unit>
+public sealed class LogoutRequestCommandHandler(IUsuarioSessaoRepository usuarioSessaoRepository) :IRequestHandler<LogoutCommand, Unit>
 {
   private readonly IUsuarioSessaoRepository _usuarioSessaoRepository = usuarioSessaoRepository;
-  public async Task<Unit> HandleAsync(string jti, CancellationToken cancellationToken = default)
+  public async Task<Unit> Handle(LogoutCommand request, CancellationToken cancellationToken = default)
   {
-    if (string.IsNullOrWhiteSpace(jti))
+    if (string.IsNullOrWhiteSpace(request.Jti))
       throw new UnauthorizedAccessException("Token de acesso inválido.");
 
-    var sessao = await _usuarioSessaoRepository.GetByJtiAsync(jti, cancellationToken) 
+    var sessao = await _usuarioSessaoRepository.GetByJtiAsync(request.Jti, cancellationToken) 
       ?? throw new UnauthorizedAccessException("Sessão não encontrada.");
 
     sessao.Revogar();

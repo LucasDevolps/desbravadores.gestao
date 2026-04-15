@@ -1,3 +1,5 @@
-﻿namespace Desbravadores.Gestao.Application.Common;
+﻿using MediatR;
 
-public sealed record EmptyRequest;
+namespace Desbravadores.Gestao.Application.Common;
+
+public sealed record EmptyRequest : IRequest<Guid>;

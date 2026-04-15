@@ -1,6 +1,8 @@
-﻿namespace Desbravadores.Gestao.Domain.DTOs;
+﻿using MediatR;
 
-public sealed class UsuarioDTO()
+namespace Desbravadores.Gestao.Domain.DTOs;
+
+public sealed class UsuarioDTO() : IRequest<IEnumerable<UsuarioDTO>>
 {
   public Guid Id { get; set; } = Guid.NewGuid();
   public string Nome { get; set; } = string.Empty;

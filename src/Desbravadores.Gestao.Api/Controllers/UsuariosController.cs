@@ -1,9 +1,9 @@
 ﻿using Desbravadores.Gestao.Application.Common;
-using Desbravadores.Gestao.Application.Interfaces;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.BuscaPorId;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.GetAll;
 using Desbravadores.Gestao.Domain.DTOs;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +12,10 @@ namespace Desbravadores.Gestao.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public sealed class UsuariosController : BaseController
+public sealed class UsuariosController(IMediator mediator) : Controller
 {
+
+  private readonly IMediator _mediator = mediator;
 
   [Authorize(Policy = "MasterOnly")]
   [HttpPost]
@@ -22,18 +24,13 @@ public sealed class UsuariosController : BaseController
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   [ProducesResponseType(StatusCodes.Status403Forbidden)]
   public async Task<IActionResult> CriarUsuario(
-      [FromServices] CriarUsuarioRequestHandler criarUsuarioHandler,
-      [FromBody] CriarUsuarioRequest request,
-      CancellationToken cancellationToken = default)
+        [FromBody] CriarUsuarioCommand command,
+        CancellationToken cancellationToken = default)
   {
-    return await ExecuteCreatedAsync(
-        request,
-        criarUsuarioHandler,
-        nameof(ObterPorId),
-        id => new { id },
-        id => new { id },
-        cancellationToken);
+    var id = await _mediator.Send(command, cancellationToken);
+    return CreatedAtAction(nameof(ObterPorId), new { id }, new { id });
   }
+
   [AllowAnonymous]
   [HttpPost("publicos")]
   [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status201Created)]
@@ -41,29 +38,24 @@ public sealed class UsuariosController : BaseController
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   [ProducesResponseType(StatusCodes.Status403Forbidden)]
   public async Task<IActionResult> CriarUsuarioPublicos(
-    [FromServices] CriarUsuarioRequestHandler criarUsuarioHandler,
-    [FromBody] CriarUsuarioRequest request,
-    CancellationToken cancellationToken = default)
+        [FromBody] CriarUsuarioCommand command,
+        CancellationToken cancellationToken = default)
   {
-    return await ExecuteCreatedAsync(
-        request,
-        criarUsuarioHandler,
-        nameof(ObterPorId),
-        id => new { id },
-        id => new { id },
-        cancellationToken);
+    var id = await _mediator.Send(command, cancellationToken);
+    return CreatedAtAction(nameof(ObterPorId), new { id }, new { id });
   }
+
   [Authorize(Policy = "Financeiro")]
   [HttpGet]
-  [ProducesResponseType(StatusCodes.Status200OK)]
+  [ProducesResponseType(typeof(IEnumerable<UsuarioDTO>), StatusCodes.Status200OK)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   [ProducesResponseType(StatusCodes.Status403Forbidden)]
-  public async Task<IActionResult> GetAll(
-    [FromServices] GetAllUsuariosRequestHandler getAllUsuariosRequestHandler,
-    CancellationToken cancellationToken = default)
+  public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
   {
-    return await ExecuteAsync(new EmptyRequest(), getAllUsuariosRequestHandler, cancellationToken);
+    var response = await _mediator.Send(new GetAllUsuariosQuery(), cancellationToken);
+    return Ok(response);
   }
+
   [Authorize(Policy = "MasterOnly")]
   [HttpGet("{id:guid}")]
   [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status200OK)]
@@ -71,13 +63,11 @@ public sealed class UsuariosController : BaseController
   [ProducesResponseType(StatusCodes.Status403Forbidden)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
   public async Task<IActionResult> ObterPorId(
-    [FromServices] BuscaPorIdRequestHandler buscaPorIdHandler,
     [FromRoute] Guid id,    
     CancellationToken cancellationToken = default)
   {
-    return await ExecuteAsync(
-        id,
-        buscaPorIdHandler,
-        cancellationToken);
+    var query = new BuscaUsuarioPorIdQuery(id);
+    var response = await _mediator.Send(query, cancellationToken);
+    return Ok(response);
   }
 }

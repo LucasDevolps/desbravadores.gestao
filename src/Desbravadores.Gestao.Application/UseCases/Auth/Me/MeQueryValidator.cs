@@ -2,9 +2,9 @@
 
 namespace Desbravadores.Gestao.Application.UseCases.Auth.Me;
 
-public class MeRequestValidator : AbstractValidator<MeRequest>
+public class MeQueryValidator : AbstractValidator<MeQuery>
 {
-  public MeRequestValidator()
+  public MeQueryValidator()
   {
     RuleFor(x => x.Sub).NotEmpty();
     RuleFor(x => x.Jti).NotEmpty();

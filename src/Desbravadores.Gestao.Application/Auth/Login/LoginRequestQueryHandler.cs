@@ -2,22 +2,23 @@
 using Desbravadores.Gestao.Application.Interfaces;
 using Desbravadores.Gestao.Domain.Entities;
 using Desbravadores.Gestao.Domain.Interfaces.Repositories;
+using MediatR;
 
 namespace Desbravadores.Gestao.Application.Auth.Login;
 
-public sealed class LoginRequestHandler(
+public sealed class LoginRequestQueryHandler(
     IUsuarioRepository usuarioRepository,
     IUsuarioSessaoRepository usuarioSessaoRepository,
     ITokenService tokenService,
     IPasswordHasher passwordHasher)
-    : IAppRequestHandler<LoginRequest, LoginResponse>
+    : IRequestHandler<LoginRequestQuery, LoginResponse>
 {
   private readonly IUsuarioRepository _usuarioRepository = usuarioRepository;
   private readonly IUsuarioSessaoRepository _usuarioSessaoRepository = usuarioSessaoRepository;
   private readonly ITokenService _tokenService = tokenService;
   private readonly IPasswordHasher _passwordHasher = passwordHasher;
 
-  public async Task<LoginResponse> HandleAsync(LoginRequest request, CancellationToken cancellationToken = default)
+  public async Task<LoginResponse> Handle(LoginRequestQuery request, CancellationToken cancellationToken = default)
   {
     var usuario = await _usuarioRepository.GetByEmailAsync(request.Email, cancellationToken)
       ?? throw new UnauthorizedAccessException("E-mail ou senha inválidos.");

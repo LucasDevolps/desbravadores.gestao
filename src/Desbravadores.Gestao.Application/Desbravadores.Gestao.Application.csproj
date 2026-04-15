@@ -1,6 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Auth\Me\**" />
+    <EmbeddedResource Remove="Auth\Me\**" />
+    <None Remove="Auth\Me\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Desbravadores.Gestao.Domain\Desbravadores.Gestao.Domain.csproj" />
   </ItemGroup>
 
@@ -10,10 +16,6 @@
     <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.17.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Auth\Me\" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -13,19 +13,19 @@ public static class DependencyInjection
 {
   public static IServiceCollection AddApplication(this IServiceCollection services)
   {
-    services.AddScoped<IValidator<CriarUsuarioRequest>, CriarUsuarioRequestValidator>();
-    services.AddScoped<CriarUsuarioRequestHandler>();
+    services.AddScoped<IValidator<CriarUsuarioCommand>, CriarUsuarioCommandValidator>();
+    services.AddScoped<CriarUsuarioCommandHandler>();
     
-    services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
-    services.AddScoped<LoginRequestHandler>();
+    services.AddScoped<IValidator<LoginRequestQuery>, LoginRequestValidator>();
+    services.AddScoped<LoginRequestQueryHandler>();
     
-    services.AddScoped<LogoutRequestHandler>();
-    services.AddScoped<MeRequestHandler>();
+    services.AddScoped<LogoutRequestCommandHandler>();
+    services.AddScoped<MeQueryHandler>();
 
-    services.AddScoped<MeRequestHandler>();
-    services.AddScoped<IValidator<MeRequest>, MeRequestValidator>();
+    services.AddScoped<MeQueryHandler>();
+    services.AddScoped<IValidator<MeQuery>, MeQueryValidator>();
 
-    services.AddScoped<GetAllUsuariosRequestHandler>();
+    services.AddScoped<GetAllUsuariosQueryHandler>();
     services.AddScoped<BuscaPorIdRequestHandler>();
 
     return services;
