@@ -1,12 +1,8 @@
 using Desbravadores.Gestao.Api.Security;
 using Desbravadores.Gestao.Application;
-using Desbravadores.Gestao.Application.Auth.Login;
-using Desbravadores.Gestao.Application.Interfaces;
-using Desbravadores.Gestao.Domain.Interfaces.Repositories;
 using Desbravadores.Gestao.Infrastructure;
 using Desbravadores.Gestao.Infrastructure.Data;
-using Desbravadores.Gestao.Infrastructure.Repositories;
-using Desbravadores.Gestao.Infrastructure.Security;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,13 +24,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
-builder.Services.AddScoped<IUsuarioSessaoRepository, UsuarioSessaoRepository>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-
-builder.Services.AddScoped<LoginRequestHandler>();
-builder.Services.AddScoped<LoginRequestValidator>();
-
+      builder.Services.AddMediatR(cfg =>
+      {
+        cfg.RegisterServicesFromAssembly(typeof(ApplicationAssemblyReference).Assembly);
+      });
 
 builder.Services.AddJwtAuthentication();
 
@@ -75,6 +68,51 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddAuthorizationBuilder().AddPolicies();
 
 var app = builder.Build();
+
+      app.UseExceptionHandler(errorApp =>
+      {
+        errorApp.Run(async context =>
+        {
+          var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+          var exception = exceptionHandlerFeature?.Error;
+
+          context.Response.ContentType = "application/json";
+
+          switch (exception)
+          {
+            case UnauthorizedAccessException:
+              context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+              await context.Response.WriteAsJsonAsync(new
+              {
+                Message = exception.Message
+              });
+              break;
+
+            case KeyNotFoundException:
+              context.Response.StatusCode = StatusCodes.Status404NotFound;
+              await context.Response.WriteAsJsonAsync(new
+              {
+                Message = exception.Message
+              });
+              break;
+            case InvalidOperationException:
+              context.Response.StatusCode = StatusCodes.Status404NotFound;
+              await context.Response.WriteAsJsonAsync(new
+              {
+                Message = exception.Message
+              });
+              break;
+
+            default:
+              context.Response.StatusCode = StatusCodes.Status400BadRequest;
+              await context.Response.WriteAsJsonAsync(new
+              {
+                Message = "Ocorreu um erro interno."
+              });
+              break;
+          }
+        });
+      });
 
 using (var scope = app.Services.CreateScope())
 {
