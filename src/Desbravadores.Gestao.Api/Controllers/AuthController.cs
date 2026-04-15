@@ -1,6 +1,7 @@
 ﻿using Desbravadores.Gestao.Application.Auth.Login;
-using Desbravadores.Gestao.Application.Interfaces;
-using Desbravadores.Gestao.Domain.Interfaces.Repositories;
+using Desbravadores.Gestao.Application.Auth.Logout;
+using Desbravadores.Gestao.Application.Auth.Me;
+using Desbravadores.Gestao.Domain.DTOs;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,59 +38,34 @@ public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
   [ProducesResponseType(StatusCodes.Status204NoContent)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   public async Task<IActionResult> Logout(
-    [FromServices] IUsuarioSessaoRepository usuarioSessaoRepository,
+    [FromServices] LogoutRequestHandler logoutRequestHandler,
     CancellationToken cancellationToken)
   {
-    var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
-
-    if (string.IsNullOrWhiteSpace(jti))
-      return Unauthorized();
-
-    var sessao = await usuarioSessaoRepository.GetByJtiAsync(jti, cancellationToken);
-
-    if (sessao is null)
-      return Unauthorized();
-
-    sessao.Revogar();
-    await usuarioSessaoRepository.SaveChangesAsync(cancellationToken);
+    await logoutRequestHandler.HandleAsync(
+        User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty,
+        cancellationToken);
 
     return NoContent();
   }
 
-
   [Authorize]
   [HttpGet("Me")]
-  [ProducesResponseType(StatusCodes.Status200OK)]
+  [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status200OK)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
   public async Task<IActionResult> Me(
-      [FromServices] IUsuarioRepository usuarioRepository,
-      [FromServices] IUsuarioSessaoRepository usuarioSessaoRepository,
-      CancellationToken cancellationToken)
+    [FromServices] MeRequestHandler meRequestHandler,
+    CancellationToken cancellationToken)
   {
-    var uuidValue = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
-        ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-    if (!Guid.TryParse(uuidValue, out var uuid))
-      return Unauthorized("Token inválido: UUID não encontrado.");
+    var sub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+              ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
     var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
 
-    if (string.IsNullOrWhiteSpace(jti))
-      return Unauthorized("Token inválido: JTI não encontrado.");
+    if (string.IsNullOrWhiteSpace(sub) || string.IsNullOrWhiteSpace(jti))
+      return Unauthorized("Token inválido.");
 
-    var usuario = await usuarioRepository.GetByUuidAsync(uuid, cancellationToken);
-
-    if (usuario is null)
-      return NotFound("Usuário não encontrado.");
-
-    var tokenValido = await usuarioSessaoRepository.ExistsActiveSessionAsync(
-        usuario.Id,
-        jti,
-        cancellationToken);
-
-    if (!tokenValido)
-      return Unauthorized("Token revogado, expirado ou inválido.");
+    var usuario = await meRequestHandler.HandleAsync(sub, jti, cancellationToken);
 
     return Ok(usuario);
   }
