@@ -1,7 +1,9 @@
+using Desbravadores.Gestao.Application.Interfaces;
+using Desbravadores.Gestao.Domain.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Desbravadores.Gestao.Api.Security;
 
@@ -19,22 +21,61 @@ public static class JwtAuthenticationExtensions
                           ?? throw new InvalidOperationException("JWT_AUDIENCE não configurado.");
 
         services
-          .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-          .AddJwtBearer(options =>
-          {
-            options.MapInboundClaims = false;
-            options.TokenValidationParameters = new TokenValidationParameters
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
             {
-              ValidateIssuer = true,
-              ValidateAudience = true,
-              ValidateLifetime = true,
-              ValidateIssuerSigningKey = true,
-              ValidIssuer = jwtIssuer,
-              ValidAudience = jwtAudience,
-              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
-            };
-          });
+              options.TokenValidationParameters = new TokenValidationParameters
+              {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtIssuer,
+                ValidAudience = jwtAudience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+                ClockSkew = TimeSpan.Zero
+              };
 
-        return services;
+              options.Events = new JwtBearerEvents
+              {
+                OnTokenValidated = async context =>
+                {
+                  var uuidValue = context.Principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+                      ?? context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+                  var jti = context.Principal?.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+
+                  if (!Guid.TryParse(uuidValue, out var uuid) || string.IsNullOrWhiteSpace(jti))
+                  {
+                    context.Fail("Token inválido.");
+                    return;
+                  }
+
+                  var usuarioRepository = context.HttpContext.RequestServices
+                      .GetRequiredService<IUsuarioRepository>();
+
+                  var usuarioSessaoRepository = context.HttpContext.RequestServices
+                      .GetRequiredService<IUsuarioSessaoRepository>();
+
+                  var usuario = await usuarioRepository.GetByUuidAsync(uuid, context.HttpContext.RequestAborted);
+
+                  if (usuario is null)
+                  {
+                    context.Fail("Usuário não encontrado.");
+                    return;
+                  }
+
+                  var tokenValido = await usuarioSessaoRepository.ExistsActiveSessionAsync(
+                      usuario.Id,
+                      jti,
+                      context.HttpContext.RequestAborted);
+
+                  if (!tokenValido)
+                    context.Fail("Token revogado, expirado ou inválido.");
+                }
+              };
+            });
+
+    return services;
     }
 }

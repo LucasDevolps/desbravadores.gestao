@@ -26,7 +26,36 @@ public sealed class UsuarioSessaoRepository(AppDbContext context) : IUsuarioSess
         .Include(x => x.Usuario)
         .FirstOrDefaultAsync(x => x.RefreshToken == refreshToken, cancellationToken);
   }
+  public async Task RevokeAllActiveByUsuarioIdAsync(long usuarioId, CancellationToken cancellationToken = default)
+  {
+    var agora = DateTime.UtcNow;
 
+    await _context.UsuarioSessoes
+      .Where(x =>
+          x.UsuarioId == usuarioId &&
+          !x.Revogado &&
+          x.RefreshTokenExpiraEm > agora)
+      .ExecuteUpdateAsync(setters => setters
+          .SetProperty(x => x.Revogado, true)
+          .SetProperty(x => x.DataRevogacao, agora),
+          cancellationToken);
+  }
+  public async Task<bool> ExistsActiveSessionAsync(
+    long usuarioId,
+    string jti,
+    CancellationToken cancellationToken = default)
+  {
+    var agora = DateTime.UtcNow;
+
+    return await _context.UsuarioSessoes
+        .AnyAsync(x =>
+            x.UsuarioId == usuarioId &&
+            x.Jti == jti &&
+            !x.Revogado &&
+            x.DataRevogacao == null &&
+            x.AccessTokenExpiraEm > agora,
+            cancellationToken);
+  }
   public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
   {
     await _context.SaveChangesAsync(cancellationToken);
