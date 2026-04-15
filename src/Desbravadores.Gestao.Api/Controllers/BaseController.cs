@@ -1,5 +1,4 @@
-﻿using Desbravadores.Gestao.Api.Interfaces;
-using Desbravadores.Gestao.Application.Interfaces;
+﻿using Desbravadores.Gestao.Application.Interfaces;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -57,12 +56,11 @@ public abstract class BaseController : ControllerBase
     {
       return BadRequest(new { Mensagem = ex.Message });
     }
-    catch (Exception ex)
+    catch 
     {
       return StatusCode(StatusCodes.Status500InternalServerError, new
       {
         Mensagem = "Ocorreu um erro interno ao processar a requisição.",
-        Detalhe = ex.Message
       });
     }
   }
@@ -87,7 +85,7 @@ public abstract class BaseController : ControllerBase
         {
           return BadRequest(new
           {
-            Mensagem = "Foram encontrados erros de validação.",
+            Mensagem = "Ocorreu um erro interno ao processar a requisição.",
             Erros = validationResult.Errors.Select(x => new
             {
               Campo = x.PropertyName,
@@ -120,12 +118,11 @@ public abstract class BaseController : ControllerBase
     {
       return BadRequest(new { Mensagem = ex.Message });
     }
-    catch (Exception ex)
+    catch 
     {
       return StatusCode(StatusCodes.Status500InternalServerError, new
       {
         Mensagem = "Ocorreu um erro interno ao processar a requisição.",
-        Detalhe = ex.Message
       });
     }
   }
@@ -168,12 +165,11 @@ public abstract class BaseController : ControllerBase
     {
       return NotFound(new { Mensagem = ex.Message });
     }
-    catch (Exception ex)
+    catch
     {
       return StatusCode(500, new
       {
-        Mensagem = "Erro interno",
-        Detalhe = ex.Message
+        Mensagem = "Ocorreu um erro interno ao processar a requisição.",
       });
     }
   }

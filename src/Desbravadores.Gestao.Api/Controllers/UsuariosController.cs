@@ -1,5 +1,6 @@
 ﻿using Desbravadores.Gestao.Application.Common;
 using Desbravadores.Gestao.Application.Interfaces;
+using Desbravadores.Gestao.Application.UseCases.Usuarios.BuscaPorId;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.GetAll;
 using Desbravadores.Gestao.Domain.DTOs;
@@ -70,15 +71,13 @@ public sealed class UsuariosController : BaseController
   [ProducesResponseType(StatusCodes.Status403Forbidden)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
   public async Task<IActionResult> ObterPorId(
-    [FromRoute] Guid id,
-    [FromServices] IUsuarioRepository usuarioRepository,
+    [FromServices] BuscaPorIdRequestHandler buscaPorIdHandler,
+    [FromRoute] Guid id,    
     CancellationToken cancellationToken = default)
   {
-    var usuario = await usuarioRepository.GetByIdAsync(id, cancellationToken);
-
-    if (usuario is null)
-      return NotFound("Usuário não encontrado.");
-
-    return Ok(usuario);
+    return await ExecuteAsync(
+        id,
+        buscaPorIdHandler,
+        cancellationToken);
   }
 }

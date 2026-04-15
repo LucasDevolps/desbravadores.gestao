@@ -1,6 +1,7 @@
 ﻿using Desbravadores.Gestao.Application.Auth.Login;
 using Desbravadores.Gestao.Application.Auth.Logout;
 using Desbravadores.Gestao.Application.UseCases.Auth.Me;
+using Desbravadores.Gestao.Application.UseCases.Usuarios.BuscaPorId;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.GetAll;
 using FluentValidation;
@@ -25,6 +26,7 @@ public static class DependencyInjection
     services.AddScoped<IValidator<MeRequest>, MeRequestValidator>();
 
     services.AddScoped<GetAllUsuariosRequestHandler>();
+    services.AddScoped<BuscaPorIdRequestHandler>();
 
     return services;
   }
