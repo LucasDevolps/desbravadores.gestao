@@ -27,11 +27,6 @@ public abstract class BaseController : ControllerBase
           return BadRequest(new
           {
             Mensagem = "Foram encontrados erros de validação.",
-            Erros = validationResult.Errors.Select(x => new
-            {
-              Campo = x.PropertyName,
-              Erro = x.ErrorMessage
-            })
           });
         }
       }
@@ -60,7 +55,7 @@ public abstract class BaseController : ControllerBase
     {
       return StatusCode(StatusCodes.Status500InternalServerError, new
       {
-        Mensagem = "Ocorreu um erro interno ao processar a requisição.",
+        Mensagem = "Ocorreu um erro interno ao processar a requisição."
       });
     }
   }
@@ -85,12 +80,7 @@ public abstract class BaseController : ControllerBase
         {
           return BadRequest(new
           {
-            Mensagem = "Ocorreu um erro interno ao processar a requisição.",
-            Erros = validationResult.Errors.Select(x => new
-            {
-              Campo = x.PropertyName,
-              Erro = x.ErrorMessage
-            })
+            Mensagem = "Ocorreu um erro interno ao processar a requisição."
           });
         }
       }
@@ -144,11 +134,6 @@ public abstract class BaseController : ControllerBase
           return BadRequest(new
           {
             Mensagem = "Erros de validação",
-            Erros = validationResult.Errors.Select(x => new
-            {
-              Campo = x.PropertyName,
-              Erro = x.ErrorMessage
-            })
           });
         }
       }
