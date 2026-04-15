@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 
-public sealed class CriarUsuarioValidation : AbstractValidator<CriarUsuarioRequest>
+public sealed class CriarUsuarioRequestValidator : AbstractValidator<CriarUsuarioRequest>
 {
-  public CriarUsuarioValidation()
+  public CriarUsuarioRequestValidator()
   {
     RuleFor(x => x.Nome)
         .NotEmpty()

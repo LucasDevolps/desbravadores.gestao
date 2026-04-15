@@ -1,8 +1,7 @@
 ﻿using Desbravadores.Gestao.Application.Auth.Login;
 using Desbravadores.Gestao.Application.Auth.Logout;
-using Desbravadores.Gestao.Application.Auth.Me;
+using Desbravadores.Gestao.Application.UseCases.Auth.Me;
 using Desbravadores.Gestao.Domain.DTOs;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -11,9 +10,8 @@ namespace Desbravadores.Gestao.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
+public class AuthController : BaseController
 {
-  private readonly IValidator<LoginRequest> _validator = validator;
 
   [HttpPost("login")]
   [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
@@ -24,13 +22,10 @@ public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
       [FromBody] LoginRequest request,
       CancellationToken cancellationToken)
   {
-    var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-
-    if (!validationResult.IsValid)
-      return BadRequest(validationResult.Errors);
-
-    var response = await loginRequestHandler.HandleAsync(request, cancellationToken);
-    return Ok(response);
+    return await ExecuteAsync(
+        request,
+        loginRequestHandler,
+        cancellationToken);
   }
 
   [Authorize]
@@ -38,14 +33,12 @@ public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
   [ProducesResponseType(StatusCodes.Status204NoContent)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   public async Task<IActionResult> Logout(
-    [FromServices] LogoutRequestHandler logoutRequestHandler,
+    [FromServices] LogoutRequestHandler handler,
     CancellationToken cancellationToken)
   {
-    await logoutRequestHandler.HandleAsync(
-        User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty,
-        cancellationToken);
+    var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value ?? string.Empty;
 
-    return NoContent();
+    return await ExecuteNoContentAsync(jti, handler, cancellationToken);
   }
 
   [Authorize]
@@ -54,7 +47,7 @@ public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
   public async Task<IActionResult> Me(
-    [FromServices] MeRequestHandler meRequestHandler,
+    [FromServices] MeRequestHandler handler,
     CancellationToken cancellationToken)
   {
     var sub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
@@ -65,8 +58,8 @@ public class AuthController(IValidator<LoginRequest> validator) : ControllerBase
     if (string.IsNullOrWhiteSpace(sub) || string.IsNullOrWhiteSpace(jti))
       return Unauthorized("Token inválido.");
 
-    var usuario = await meRequestHandler.HandleAsync(sub, jti, cancellationToken);
+    var request = new MeRequest(sub, jti);
 
-    return Ok(usuario);
+    return await ExecuteAsync(request, handler, cancellationToken);
   }
 }

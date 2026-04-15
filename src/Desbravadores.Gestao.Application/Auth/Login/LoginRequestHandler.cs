@@ -10,6 +10,7 @@ public sealed class LoginRequestHandler(
     IUsuarioSessaoRepository usuarioSessaoRepository,
     ITokenService tokenService,
     IPasswordHasher passwordHasher)
+    : IAppRequestHandler<LoginRequest, LoginResponse>
 {
   private readonly IUsuarioRepository _usuarioRepository = usuarioRepository;
   private readonly IUsuarioSessaoRepository _usuarioSessaoRepository = usuarioSessaoRepository;

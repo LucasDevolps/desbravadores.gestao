@@ -4,28 +4,39 @@ using Desbravadores.Gestao.Domain.Entities;
 
 namespace Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 
-public sealed class CriarUsuarioRequestHandler(IUsuarioRepository usuarioRepository, IPasswordHasher passwordHasher)
+public sealed class CriarUsuarioRequestHandler(
+    IUsuarioRepository usuarioRepository,
+    IPasswordHasher passwordHasher)
+    : IAppRequestHandler<CriarUsuarioRequest, Guid>
 {
   private readonly IUsuarioRepository _usuarioRepository = usuarioRepository;
   private readonly IPasswordHasher _passwordHasher = passwordHasher;
 
-  public async Task<Guid> HandleAsync(CriarUsuarioRequest command, CancellationToken cancellationToken = default)
+  public async Task<Guid> HandleAsync(
+      CriarUsuarioRequest request,
+      CancellationToken cancellationToken = default)
   {
-    var usuarioExistente = await _usuarioRepository.GetByEmailAsync(command.Email, cancellationToken);
+    var usuarioExistente = await _usuarioRepository.GetByEmailAsync(
+        request.Email,
+        cancellationToken);
 
     if (usuarioExistente is not null)
-      throw new InvalidOperationException("Já existe um usuário cadastrado com o email informado.");
+      throw new InvalidOperationException("Já existe um usuário cadastrado com o e-mail informado.");
 
-    var senhaHash = await _passwordHasher.HashAsync(command.Senha, cancellationToken);
+    var senhaHash = await _passwordHasher.HashAsync(
+        request.Senha,
+        cancellationToken);
 
     var usuario = new Usuario(
-      command.Nome.Trim(),
-      command.Email.Trim().ToLowerInvariant(),
-      senhaHash,
-      command.Roles.Trim()
-    );
+        request.Nome.Trim(),
+        request.Email.Trim().ToLowerInvariant(),
+        senhaHash,
+        request.Roles.Trim());
 
-    await _usuarioRepository.AdicionarUsuarioAsync(usuario, cancellationToken);
+    await _usuarioRepository.AdicionarUsuarioAsync(
+        usuario,
+        cancellationToken);
+
     return usuario.Uuid;
   }
 }
