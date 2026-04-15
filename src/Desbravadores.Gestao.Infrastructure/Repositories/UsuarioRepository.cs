@@ -1,4 +1,5 @@
-﻿using Desbravadores.Gestao.Application.Interfaces;
+﻿using Desbravadores.Gestao.Application.Common;
+using Desbravadores.Gestao.Application.Interfaces;
 using Desbravadores.Gestao.Domain.DTOs;
 using Desbravadores.Gestao.Domain.Entities;
 using Desbravadores.Gestao.Infrastructure.Data;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Desbravadores.Gestao.Infrastructure.Repositories;
 
-public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
+public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository 
 {
   private readonly AppDbContext _context = context;
 
