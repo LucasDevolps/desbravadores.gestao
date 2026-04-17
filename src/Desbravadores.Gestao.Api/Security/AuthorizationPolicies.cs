@@ -9,13 +9,13 @@ public static class AuthorizationPolicies
     {
         builder.AddPolicy("MasterOnly", policy =>
             policy.RequireRole(
-                Role.DIRETORIA.ToString(),
-                Role.SECRETARIA.ToString()))
+                Roles.DIRETORIA.ToString(),
+                Roles.SECRETARIA.ToString()))
 
         .AddPolicy("Financeiro", policy =>
             policy.RequireRole(
-                Role.TESOURARIA.ToString(),
-                Role.DIRETORIA.ToString()));
+                Roles.TESOURARIA.ToString(),
+                Roles.DIRETORIA.ToString()));
         return builder;
     }
 }
