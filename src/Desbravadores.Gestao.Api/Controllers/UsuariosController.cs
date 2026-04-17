@@ -20,6 +20,7 @@ public sealed class UsuariosController(IMediator mediator) : Controller
 
   [Authorize(Policy = "MasterOnly")]
   [HttpPost]
+  [Consumes("application/json")]
   [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
   [ProducesResponseType(StatusCodes.Status400BadRequest)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
