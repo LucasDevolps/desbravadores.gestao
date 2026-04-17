@@ -1,5 +1,7 @@
-﻿using Desbravadores.Gestao.Application.UseCases.Usuarios.BuscaPorId;
+﻿using Desbravadores.Gestao.Application.UseCases.Usuarios.AtualizarUsuario;
+using Desbravadores.Gestao.Application.UseCases.Usuarios.BuscaPorId;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
+using Desbravadores.Gestao.Application.UseCases.Usuarios.DeletarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.GetAll;
 using Desbravadores.Gestao.Domain.DTOs;
 using MediatR;
@@ -69,4 +71,33 @@ public sealed class UsuariosController(IMediator mediator) : Controller
     var response = await _mediator.Send(query, cancellationToken);
     return Ok(response);
   }
+  [Authorize(Policy = "MasterOnly")]
+  [HttpDelete("{id:guid}")]
+  [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status204NoContent)]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  [ProducesResponseType(StatusCodes.Status403Forbidden)]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
+  public async Task<IActionResult> DeletarUsuario(
+    [FromRoute] Guid id,
+    CancellationToken cancellationToken = default)
+  {
+    var command = new DeletarUsuarioCommand(id);
+    await _mediator.Send(command, cancellationToken);
+    return NoContent();
+  }
+  [Authorize(Policy = "MasterOnly")]
+  [HttpPut()]
+  [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status204NoContent)]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  [ProducesResponseType(StatusCodes.Status403Forbidden)]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
+  public async Task<IActionResult> AtualizarUsuario(
+    [FromBody] AtualizarUsuarioCommand command,
+    CancellationToken cancellationToken = default)
+  {
+    await _mediator.Send(command, cancellationToken);
+    return NoContent();
+  }
+
+
 }

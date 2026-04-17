@@ -50,7 +50,7 @@ public class AuthController(IMediator mediator) : Controller
     CancellationToken cancellationToken)
   {
     var sub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
-              ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
+              ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
               ?? string.Empty;
 
     var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value

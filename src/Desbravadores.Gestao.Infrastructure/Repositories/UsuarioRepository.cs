@@ -58,9 +58,22 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
       await _context.SaveChangesAsync(cancellationToken);
   }
 
-  public async Task UpdateAsync(Usuario usuario, CancellationToken cancellationToken = default)
+  public async Task<UsuarioDTO> UpdateAsync(Usuario usuario, CancellationToken cancellationToken = default)
   {
     _context.Usuarios.Update(usuario);
     await _context.SaveChangesAsync(cancellationToken);
+    
+    var usuarioDTO = new UsuarioDTO();
+    usuarioDTO.FromEntity(usuario);
+    return usuarioDTO;
+  }
+  public async Task DeletarUsuarioAsync(Guid id, CancellationToken cancellationToken = default)
+  {
+    var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Uuid == id, cancellationToken);
+    if (usuario != null)
+    {
+      _context.Usuarios.Remove(usuario);
+      await _context.SaveChangesAsync(cancellationToken);
+    }
   }
 }
