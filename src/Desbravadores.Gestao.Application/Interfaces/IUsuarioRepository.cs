@@ -11,6 +11,6 @@ public interface IUsuarioRepository
     Task AdicionarUsuarioAsync(Usuario usuario, CancellationToken cancellationToken = default);
     Task<IEnumerable<UsuarioDTO>> GetAllAsync(CancellationToken cancellationToken = default);
     Task RemoveAsync(Usuario usuario, CancellationToken cancellationToken = default);
-    Task UpdateAsync(Usuario usuario, CancellationToken cancellationToken = default);
-    
+    Task<UsuarioDTO> UpdateAsync(Usuario usuario, CancellationToken cancellationToken = default);
+    Task DeletarUsuarioAsync(Guid id, CancellationToken cancellationToken);
 }

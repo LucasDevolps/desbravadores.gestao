@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Desbravadores.Gestao.Domain.Entities;
+using MediatR;
 
 namespace Desbravadores.Gestao.Domain.DTOs;
 
@@ -9,4 +10,11 @@ public sealed class UsuarioDTO() : IRequest<IEnumerable<UsuarioDTO>>
   public string Email { get; set; } = string.Empty;
   public DateOnly DataCriacao { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
 
+  public void FromEntity(Usuario usuario)
+  {
+    Id = usuario.Uuid;
+    Nome = usuario.Nome;
+    Email = usuario.Email;
+    DataCriacao = usuario.DataCriacao;
+  }
 }
