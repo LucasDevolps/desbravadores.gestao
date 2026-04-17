@@ -21,7 +21,7 @@ public sealed class CriarUsuarioCommandValidator : AbstractValidator<CriarUsuari
         .WithMessage("A senha é obrigatória.");
     RuleFor(x => x.Roles)
     .NotEmpty()
-    .Must(role => Enum.TryParse(typeof(Role), role, true, out _))
+    .Must(role => Enum.TryParse(typeof(Roles), role, true, out _))
     .WithMessage("Role inválida.");
 
   }

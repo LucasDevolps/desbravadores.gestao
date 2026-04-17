@@ -1,8 +1,10 @@
 ﻿using Desbravadores.Gestao.Application.Auth.Login;
 using Desbravadores.Gestao.Application.Auth.Logout;
 using Desbravadores.Gestao.Application.UseCases.Auth.Me;
+using Desbravadores.Gestao.Application.UseCases.Usuarios.AtualizarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.BuscaPorId;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
+using Desbravadores.Gestao.Application.UseCases.Usuarios.DeletarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.GetAll;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +31,9 @@ public static class DependencyInjection
     services.AddScoped<BuscaPorIdQueryHandler>();
 
     services.AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
+
+    services.AddScoped<AtualizarUsuarioCommandHandler>();
+    services.AddScoped<DeletarUsuarioCommandHandler>();
     return services;
   }
 }
