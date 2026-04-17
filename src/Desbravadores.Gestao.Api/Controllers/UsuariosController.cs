@@ -86,8 +86,8 @@ public sealed class UsuariosController(IMediator mediator) : Controller
     return NoContent();
   }
   [Authorize(Policy = "MasterOnly")]
-  [HttpPut()]
-  [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status204NoContent)]
+  [HttpPut]
+  [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status200OK)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   [ProducesResponseType(StatusCodes.Status403Forbidden)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -95,8 +95,8 @@ public sealed class UsuariosController(IMediator mediator) : Controller
     [FromBody] AtualizarUsuarioCommand command,
     CancellationToken cancellationToken = default)
   {
-    await _mediator.Send(command, cancellationToken);
-    return NoContent();
+    var response = await _mediator.Send(command, cancellationToken);
+    return Ok(response);
   }
 
 
