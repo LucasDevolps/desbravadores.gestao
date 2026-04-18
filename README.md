@@ -1,72 +1,153 @@
 # Desbravadores.Gestao
 
-AplicaÁ„o ASP.NET Core 10 para gerenciamento de usu·rios e autenticaÁ„o JWT com arquitetura em camadas.
+API REST em **ASP.NET Core 10** para gest√£o de usu√°rios, autentica√ß√£o JWT e controle de sess√£o ativo no banco de dados. O projeto foi estruturado em camadas para manter regra de neg√≥cio isolada, facilitar manuten√ß√£o e deixar a evolu√ß√£o da API previs√≠vel.
 
-## Vis„o geral
+## O que a API entrega hoje
 
-O projeto È organizado em quatro camadas principais:
+- **Autentica√ß√£o com JWT** (access token + refresh token) na rota de login.
+- **Sess√µes rastreadas por JTI**: cada login gera sess√£o persistida e o token s√≥ √© aceito se a sess√£o estiver ativa.
+- **Logout com revoga√ß√£o de sess√£o**: invalida a sess√£o do token atual.
+- **Endpoint `/auth/me`** para retornar os dados do usu√°rio autenticado.
+- **Gest√£o completa de usu√°rios**: criar, listar, buscar por ID, atualizar e excluir.
+- **Autoriza√ß√£o por pol√≠ticas e pap√©is** para restringir endpoints sens√≠veis.
+- **Valida√ß√£o de entrada com FluentValidation**.
+- **Documenta√ß√£o interativa via Swagger**.
 
-- `src/Desbravadores.Gestao.Api`: API Web ASP.NET Core
-- `src/Desbravadores.Gestao.Application`: lÛgica de aplicaÁ„o, casos de uso e validaÁ„o
-- `src/Desbravadores.Gestao.Domain`: entidades, DTOs, constantes e contratos de repositÛrio
-- `src/Desbravadores.Gestao.Infrastructure`: persistÍncia EF Core, repositÛrios e serviÁos de seguranÁa
+## Arquitetura
 
-TambÈm h· um projeto de testes em:
+A solu√ß√£o segue separa√ß√£o clara de responsabilidades:
 
-- `tests/Desbravadores.Gestao.UnitTests`
+- `src/Desbravadores.Gestao.Api`  
+  Camada HTTP (controllers, autentica√ß√£o JWT, pol√≠ticas de autoriza√ß√£o, Swagger e pipeline da aplica√ß√£o).
 
-## Recursos principais
+- `src/Desbravadores.Gestao.Application`  
+  Casos de uso com MediatR (commands/queries), valida√ß√µes e orquestra√ß√£o da regra de aplica√ß√£o.
 
-- AutenticaÁ„o JWT com refresh token
-- CriaÁ„o de usu·rios com validaÁ„o de dados
-- Controle de sess„o de usu·rios
-- Permissıes baseadas em polÌticas para rotas sensÌveis
-- DocumentaÁ„o Swagger integrada
+- `src/Desbravadores.Gestao.Domain`  
+  Entidades, DTOs, contratos e enumera√ß√µes de dom√≠nio.
 
-## Requisitos
+- `src/Desbravadores.Gestao.Infrastructure`  
+  Persist√™ncia com Entity Framework Core, reposit√≥rios e servi√ßos de seguran√ßa (hash de senha e gera√ß√£o de token).
 
-- .NET 10 SDK
-- SQL Server (conex„o definida por vari·vel de ambiente)
+- `tests/Desbravadores.Gestao.UnitTests`  
+  Projeto reservado para testes unit√°rios.
 
-## ConfiguraÁ„o
+## Modelo de autoriza√ß√£o
 
-Antes de executar a aplicaÁ„o, defina as vari·veis de ambiente no ambiente de desenvolvimento ou em um arquivo de configuraÁ„o apropriado:
+A API utiliza autentica√ß√£o **Bearer JWT** e pol√≠ticas por role:
 
-- `DefaultConnectionDesbravadores`: string de conex„o do SQL Server
-- `JWT_KEY`: chave secreta para assinatura do token JWT
-- `JWT_ISSUER`: emissor do token JWT
-- `JWT_AUDIENCE`: audiÍncia do token JWT
-- `Jwt_ExpiresInMinutes`: tempo de expiraÁ„o do access token (opcional, padr„o 60)
-- `Jwt_RefreshTokenDays`: tempo de expiraÁ„o do refresh token (opcional, padr„o 7)
+- **`MasterOnly`**: permite `DIRETORIA` e `SECRETARIA`.
+- **`Financeiro`**: permite `TESOURARIA` e `DIRETORIA`.
 
-## Como executar
+Perfis definidos no dom√≠nio:
 
-1. Abra a soluÁ„o `Desbravadores.Gestao.slnx` no Visual Studio ou VS Code.
-2. Certifique-se de que as vari·veis de ambiente estejam configuradas.
-3. Execute o projeto `src/Desbravadores.Gestao.Api`.
-4. Acesse a interface Swagger em `https://localhost:<porta>/swagger`.
+- `DIRETORA`
+- `SECRETARIA`
+- `TESOURARIA`
+- `DIRETORIA`
+- `DESBRAVADOR`
 
-## Estrutura das rotas
+## Fluxo de autentica√ß√£o e sess√£o
 
-- `POST /api/auth/login`: login de usu·rio
-- `POST /api/auth/logout`: logout de usu·rio (requer autenticaÁ„o)
-- `GET /api/auth/me`: obtÈm os dados do usu·rio autenticado
-- `POST /api/usuarios`: cria novo usu·rio
-- `GET /api/usuarios`: lista usu·rios
-- `GET /api/usuarios/{id}`: obtÈm usu·rio por UUID
+1. O usu√°rio autentica via `POST /api/auth/login`.
+2. A API valida credenciais, revoga sess√µes ativas anteriores do mesmo usu√°rio e cria uma nova sess√£o.
+3. O token inclui `sub` (UUID do usu√°rio), `jti`, `email`, `name` e `role`.
+4. A cada requisi√ß√£o autenticada, al√©m da valida√ß√£o padr√£o do JWT, a API verifica no banco se aquela sess√£o (`jti`) ainda est√° ativa.
+5. Em `POST /api/auth/logout`, a sess√£o atual √© revogada.
 
-## ObservaÁıes
+## Endpoints dispon√≠veis
 
-- A API est· preparada para uso com autenticaÁ„o JWT e polÌticas de autorizaÁ„o.
-- O projeto utiliza FluentValidation para validaÁ„o de requisiÁıes e EF Core para acesso a dados.
+### Autentica√ß√£o
 
-## PrÛximas ideias
+- `POST /api/auth/login`  
+  Realiza login e retorna token + metadados de sess√£o.
 
-- Dockerizar a aplicaÁ„o para facilitar execuÁ„o local e deployment.
-- Criar uma GitHub Action para deploys autom·ticos.
-- Implementar cen·rios completos de testes para garantir qualidade e confianÁa.
+- `POST /api/auth/logout` _(autenticado)_  
+  Revoga a sess√£o atual.
 
-## Contato
+- `GET /api/auth/me` _(autenticado)_  
+  Retorna os dados do usu√°rio autenticado.
 
-- Lucas de Souza
-- IASD Joaniza
+### Usu√°rios
+
+- `POST /api/usuarios` _(pol√≠tica `MasterOnly`)_  
+  Cria usu√°rio.
+
+- `POST /api/usuarios/publicos` _(an√¥nimo)_  
+  Cria usu√°rio sem exigir autentica√ß√£o.
+
+- `GET /api/usuarios` _(pol√≠tica `Financeiro`)_  
+  Lista usu√°rios.
+
+- `GET /api/usuarios/{id}` _(pol√≠tica `MasterOnly`)_  
+  Busca usu√°rio por UUID.
+
+- `PUT /api/usuarios` _(pol√≠tica `MasterOnly`)_  
+  Atualiza usu√°rio.
+
+- `DELETE /api/usuarios/{id}` _(pol√≠tica `MasterOnly`)_  
+  Remove usu√°rio.
+
+## Tecnologias e padr√µes adotados
+
+- .NET 10 / ASP.NET Core Web API
+- MediatR
+- Entity Framework Core
+- FluentValidation
+- JWT Bearer Authentication
+- Swagger / OpenAPI
+- Arquitetura em camadas (API, Application, Domain, Infrastructure)
+
+## Configura√ß√£o por vari√°veis de ambiente
+
+### Banco de dados
+
+A infraestrutura escolhe o provider com base no ambiente:
+
+- **Development**: usa **SQL Server** com `DefaultConnectionDesbravadores`.
+- **Demais ambientes**: usa **PostgreSQL** com `ConnectionStrings__DefaultConnection`.
+
+### Seguran√ßa JWT
+
+- `JWT_KEY` (obrigat√≥ria)
+- `JWT_ISSUER` (obrigat√≥ria)
+- `JWT_AUDIENCE` (obrigat√≥ria)
+- `Jwt_ExpiresInMinutes` (opcional, padr√£o: `60`)
+- `Jwt_RefreshTokenDays` (opcional, padr√£o: `7`)
+
+## Como executar localmente
+
+### Op√ß√£o 1 ‚Äî com .NET SDK
+
+1. Configure as vari√°veis de ambiente.
+2. Execute a API:
+
+```bash
+dotnet run --project src/Desbravadores.Gestao.Api
+```
+
+A aplica√ß√£o sobe na porta definida por `PORT` (padr√£o `10000`) e exp√µe Swagger em `/swagger`.
+
+### Op√ß√£o 2 ‚Äî com Docker Compose
+
+```bash
+docker compose up --build
+```
+
+Nesse cen√°rio:
+
+- SQL Server sobe em `localhost:1433`
+- API sobe em `http://localhost:8080`
+
+## Tratamento de erros
+
+A API possui tratamento global de exce√ß√µes e converte falhas de neg√≥cio em respostas HTTP consistentes:
+
+- `UnauthorizedAccessException` ‚Üí `401 Unauthorized`
+- `KeyNotFoundException` / `InvalidOperationException` ‚Üí `404 Not Found`
+- Demais exce√ß√µes ‚Üí `400 Bad Request`
+
+## Autor
+
+Lucas de Souza  
+IASD Joaniza
