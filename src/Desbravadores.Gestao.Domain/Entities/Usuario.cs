@@ -11,11 +11,11 @@ public sealed class Usuario
   public string Email { get; private set; }
   public string Senha { get; private set; }
   public DateOnly DataCriacao { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow);
-  public string Role { get; private set; } = Roles.DESBRAVADOR.ToString();
+  public Roles Role { get; private set; } = Roles.DESBRAVADOR;
 
   public ICollection<UsuarioSessao> Sessoes { get; private set; } = new List<UsuarioSessao>();
 
-  public Usuario(string nome, string email, string senha, string role)
+  public Usuario(string nome, string email, string senha, Roles role = Roles.DESBRAVADOR)
   {
     Nome = nome;
     Email = email;
@@ -29,7 +29,7 @@ public sealed class Usuario
     Email = email;
     Senha = senha;
   }
-  public Usuario(Guid id, string nome, string email, string senha, string role)
+  public Usuario(Guid id, string nome, string email, string senha, Roles role = Roles.DESBRAVADOR)
   {
     Uuid = id;
     Nome = nome;

@@ -1,5 +1,6 @@
 ﻿
 using Desbravadores.Gestao.Application.Interfaces;
+using Desbravadores.Gestao.Domain.Constants;
 using Desbravadores.Gestao.Domain.Entities;
 using MediatR;
 
@@ -30,7 +31,7 @@ public sealed class CriarUsuarioCommandHandler(
         request.Nome,
         request.Email,
         senhaHash,
-        request.Roles);
+        Enum.TryParse<Roles>(request.Roles, true,out var role) ? role : Roles.DESBRAVADOR);
 
     await _usuarioRepository.AdicionarUsuarioAsync(usuario, cancellationToken);
 

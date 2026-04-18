@@ -31,6 +31,8 @@ public static class DependencyInjection
     services.AddScoped<BuscaPorIdQueryHandler>();
 
     services.AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
+    services.AddValidatorsFromAssemblyContaining<CriarUsuarioCommandValidator>();
+    services.AddValidatorsFromAssemblyContaining<MeQueryValidator>();
 
     services.AddScoped<AtualizarUsuarioCommandHandler>();
     services.AddScoped<DeletarUsuarioCommandHandler>();
