@@ -35,6 +35,7 @@ public sealed class UsuariosController(IMediator mediator) : Controller
 
   [AllowAnonymous]
   [HttpPost("publicos")]
+  [Consumes("application/json")]
   [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status201Created)]
   [ProducesResponseType(StatusCodes.Status400BadRequest)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]

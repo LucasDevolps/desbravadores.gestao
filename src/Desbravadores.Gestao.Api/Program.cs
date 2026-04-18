@@ -4,6 +4,7 @@ using Desbravadores.Gestao.Infrastructure;
 using Desbravadores.Gestao.Infrastructure.Data;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,13 +12,16 @@ builder.Services
     .AddControllers()
     .AddJsonOptions(options =>
     {
-      options.JsonSerializerOptions.Converters.Add(
-          new System.Text.Json.Serialization.JsonStringEnumConverter()
-      );
+      options
+        .JsonSerializerOptions
+        .Converters
+        .Add(
+          new JsonStringEnumConverter()
+        );
     });
     
-//var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-//builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 builder.Services.AddEndpointsApiExplorer();
 

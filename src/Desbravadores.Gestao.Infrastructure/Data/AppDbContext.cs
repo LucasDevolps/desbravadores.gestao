@@ -38,9 +38,9 @@ namespace Desbravadores.Gestao.Infrastructure.Data
 
         entity.Property(x => x.DataCriacao)
               .IsRequired();
-
-        entity.HasIndex(x => x.Email)
-              .IsUnique();
+        entity
+              .Property(x => x.Role)
+              .HasConversion<string>();
       });
 
       modelBuilder.Entity<UsuarioSessao>(entity =>

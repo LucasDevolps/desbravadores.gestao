@@ -33,12 +33,7 @@ public sealed class MeQueryHandler(
 
     if (!tokenValido)
       throw new UnauthorizedAccessException("Token revogado, expirado ou inválido.");
-    
-    return new UsuarioDTO{
-      Id = usuario.Uuid,
-      Nome = usuario.Nome, 
-      Email = usuario.Email, 
-      DataCriacao = usuario.DataCriacao
-    };
+
+    return new UsuarioDTO().FromEntity(usuario);
   }
 }

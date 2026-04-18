@@ -1,4 +1,5 @@
-﻿using Desbravadores.Gestao.Domain.Entities;
+﻿using Desbravadores.Gestao.Domain.Constants;
+using Desbravadores.Gestao.Domain.Entities;
 using MediatR;
 
 namespace Desbravadores.Gestao.Domain.DTOs;
@@ -9,12 +10,24 @@ public sealed class UsuarioDTO() : IRequest<IEnumerable<UsuarioDTO>>
   public string Nome { get; set; } = string.Empty;
   public string Email { get; set; } = string.Empty;
   public DateOnly DataCriacao { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+  public Roles Roles { get; set; }
 
-  public void FromEntity(Usuario usuario)
+  public UsuarioDTO FromEntity(Usuario usuario)
   {
     Id = usuario.Uuid;
     Nome = usuario.Nome;
     Email = usuario.Email;
     DataCriacao = usuario.DataCriacao;
+    Roles = usuario.Role;
+    return this;
+  }
+
+  public UsuarioDTO FromEntityWithOutRoles(Usuario usuario)
+  {
+    Id = usuario.Uuid;
+    Nome = usuario.Nome;
+    Email = usuario.Email;
+    DataCriacao = usuario.DataCriacao;
+    return this;
   }
 }
