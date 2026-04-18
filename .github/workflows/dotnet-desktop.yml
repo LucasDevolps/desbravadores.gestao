@@ -22,31 +22,43 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Locate solution
-        id: solution
+      - name: Locate API project
+        id: api
         shell: bash
         run: |
-          SLN=$(find . -maxdepth 3 -name "*.sln" | head -n 1)
+          API_CSPROJ=$(find . -type f -name "Desbravadores.Gestao.Api.csproj" | head -n 1)
 
-          if [ -z "$SLN" ]; then
-            echo "Nenhum arquivo .sln encontrado."
+          if [ -z "$API_CSPROJ" ]; then
+            echo "Projeto da API não encontrado."
             exit 1
           fi
 
-          echo "Solution encontrada: $SLN"
-          echo "path=$SLN" >> $GITHUB_OUTPUT
+          echo "API encontrada: $API_CSPROJ"
+          echo "path=$API_CSPROJ" >> $GITHUB_OUTPUT
 
-      - name: Restore dependencies
-        run: dotnet restore "${{ steps.solution.outputs.path }}"
+      - name: Restore API dependencies
+        run: dotnet restore "${{ steps.api.outputs.path }}"
 
-      - name: Build
-        run: dotnet build "${{ steps.solution.outputs.path }}" --no-restore --configuration Release
+      - name: Build API
+        run: dotnet build "${{ steps.api.outputs.path }}" --no-restore --configuration Release
 
-      - name: Run tests
-        run: dotnet test "${{ steps.solution.outputs.path }}" --no-build --configuration Release --verbosity normal
+      - name: Run tests if they exist
+        shell: bash
+        run: |
+          TEST_PROJECTS=$(find . -type f \( -name "*Tests.csproj" -o -name "*.Tests.csproj" \))
 
-      - name: Publish
-        run: dotnet publish ./src/Desbravadores.Gestao.Api/Desbravadores.Gestao.Api.csproj --no-build --configuration Release --output ./publish
+          if [ -z "$TEST_PROJECTS" ]; then
+            echo "Nenhum projeto de testes encontrado. Seguindo pipeline..."
+            exit 0
+          fi
+
+          while IFS= read -r project; do
+            echo "Executando testes em: $project"
+            dotnet test "$project" --configuration Release --verbosity normal
+          done <<< "$TEST_PROJECTS"
+
+      - name: Publish API
+        run: dotnet publish "${{ steps.api.outputs.path }}" --no-build --configuration Release --output ./publish
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
