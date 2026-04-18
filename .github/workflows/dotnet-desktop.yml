@@ -6,40 +6,48 @@ on:
   pull_request:
     branches: ["main"]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Setup do .NET
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
 
-      # Restore
+      - name: Locate solution
+        id: solution
+        shell: bash
+        run: |
+          SLN=$(find . -maxdepth 3 -name "*.sln" | head -n 1)
+
+          if [ -z "$SLN" ]; then
+            echo "Nenhum arquivo .sln encontrado."
+            exit 1
+          fi
+
+          echo "Solution encontrada: $SLN"
+          echo "path=$SLN" >> $GITHUB_OUTPUT
+
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore "${{ steps.solution.outputs.path }}"
 
-      # Build
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build "${{ steps.solution.outputs.path }}" --no-restore --configuration Release
 
-      # Testes (se tiver projeto de testes)
       - name: Run tests
-        run: dotnet test ./Desbravadores.Gestao.sln --no-build --configuration Release --verbosity normal
+        run: dotnet test "${{ steps.solution.outputs.path }}" --no-build --configuration Release --verbosity normal
 
-      # Publish (gera binário pronto)
       - name: Publish
         run: dotnet publish ./src/Desbravadores.Gestao.Api/Desbravadores.Gestao.Api.csproj --no-build --configuration Release --output ./publish
 
-      # Upload do artefato (opcional)
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
