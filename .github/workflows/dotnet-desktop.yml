@@ -33,11 +33,11 @@ jobs:
 
       # Testes (se tiver projeto de testes)
       - name: Run tests
-        run: dotnet test --no-build --verbosity normal || true
+        run: dotnet test ./Desbravadores.Gestao.sln --no-build --configuration Release --verbosity normal
 
       # Publish (gera binário pronto)
       - name: Publish
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish ./src/Desbravadores.Gestao.Api/Desbravadores.Gestao.Api.csproj --no-build --configuration Release --output ./publish
 
       # Upload do artefato (opcional)
       - name: Upload artifact
