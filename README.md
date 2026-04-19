@@ -146,8 +146,11 @@ A API possui tratamento global de exceções e converte falhas de negócio em re
 - `UnauthorizedAccessException` → `401 Unauthorized`
 - `KeyNotFoundException` / `InvalidOperationException` → `404 Not Found`
 - Demais exceções → `400 Bad Request`
-
-## Autor
+---
+# Url da api publicada
+url: https://desbravadores-gestao.onrender.com/swagger/index.html
+---
+# Autor
 
 Lucas de Souza  
 IASD Joaniza
