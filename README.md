@@ -1,4 +1,4 @@
-# Desbravadores.Gestao
+# Projeto - Api
 
 API REST em **ASP.NET Core 10** para gestão de usuários, autenticação JWT e controle de sessão ativo no banco de dados. O projeto foi estruturado em camadas para manter regra de negócio isolada, facilitar manutenção e deixar a evolução da API previsível.
 
