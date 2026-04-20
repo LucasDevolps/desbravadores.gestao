@@ -1,4 +1,4 @@
-# Wiki técnica — Desbravadores Gestão API
+# Wiki
 
 > Esta wiki foi escrita **somente com base no código existente no repositório**, descrevendo o que já está implementado hoje.
 
