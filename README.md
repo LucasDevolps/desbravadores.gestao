@@ -150,4 +150,4 @@ A API possui tratamento global de exceções e converte falhas de negócio em re
 ## Autor
 
 Lucas de Souza  
-IASD Joaniza
+IASD Joaniza 
