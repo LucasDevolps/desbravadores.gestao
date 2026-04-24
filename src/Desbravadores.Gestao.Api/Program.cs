@@ -19,9 +19,12 @@ builder.Services
           new JsonStringEnumConverter()
         );
     });
-    
-var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+if (!builder.Environment.IsDevelopment())
+{
+  var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+  builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -100,7 +103,7 @@ var app = builder.Build();
               });
               break;
             case InvalidOperationException:
-              context.Response.StatusCode = StatusCodes.Status404NotFound;
+              context.Response.StatusCode = StatusCodes.Status400BadRequest;
               await context.Response.WriteAsJsonAsync(new
               {
                 Message = exception.Message
