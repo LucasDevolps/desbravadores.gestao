@@ -26,9 +26,19 @@ services:
       JWT_AUDIENCE: "Desbravadores.Gestao.Web"
       Jwt_ExpiresInMinutes: "120"
       Jwt_RefreshTokenDays: "7"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=DesbravadoresDb;User Id=sa;Password=Bkur6etc@10;TrustServerCertificate=True;" 
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=DesbravadoresDb;User Id=sa;Password=Bkur6etc@10;TrustServerCertificate=True;"
+    expose:
+      - "10000"
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: desbravadores_nginx
+    depends_on:
+      - api
     ports:
-      - "8080:10000"
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 
 volumes:
   sql_data:
