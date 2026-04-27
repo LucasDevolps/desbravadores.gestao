@@ -44,10 +44,10 @@ public class RefreshQueryHandler(
 
     UsuarioSessao sessao = new UsuarioSessao(
       usuario.Id,
-      request.Jti,
+      tokenRefresh.Jti,
       tokenRefresh.RefreshToken,
-      _tokenService.GetJWT_ACCESS_TOKEN_EXPIRES(),
-      _tokenService.GetJWT_REFRESH_TOKEN_EXPIRES()
+      tokenRefresh.AccessTokenExpiraEm,
+      tokenRefresh.RefreshTokenExpiraEm
     );
 
     await _usuarioSessaoRepository.AddAsync(sessao, cancellationToken);
@@ -56,7 +56,7 @@ public class RefreshQueryHandler(
     return new RefreshResponse
     (
       tokenRefresh,
-      _tokenService.GetJWT_ACCESS_TOKEN_EXPIRES(),
+      tokenRefresh.AccessTokenExpiraEm,
       usuario.Nome,
       usuario.Email
     );
