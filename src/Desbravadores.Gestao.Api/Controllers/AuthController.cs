@@ -1,5 +1,6 @@
 ﻿using Desbravadores.Gestao.Application.Auth.Login;
 using Desbravadores.Gestao.Application.Auth.Logout;
+using Desbravadores.Gestao.Application.Auth.Refresh;
 using Desbravadores.Gestao.Application.UseCases.Auth.Me;
 using Desbravadores.Gestao.Domain.DTOs;
 using MediatR;
@@ -57,6 +58,26 @@ public class AuthController(IMediator mediator) : Controller
               ?? string.Empty;
 
     var response = await _mediator.Send(new MeQuery(sub, jti), cancellationToken);
+
+    return Ok(response);
+  }
+
+  [Authorize]
+  [HttpGet("refresh")]
+  [ProducesResponseType(typeof(RefreshResponse), StatusCodes.Status200OK)]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
+  public async Task<IActionResult> Refresh(
+    CancellationToken cancellationToken)
+  {
+    var sub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+              ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+              ?? string.Empty;
+
+    var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value
+              ?? string.Empty;
+
+    var response = await _mediator.Send(new RefreshQuery(sub, jti), cancellationToken);
 
     return Ok(response);
   }

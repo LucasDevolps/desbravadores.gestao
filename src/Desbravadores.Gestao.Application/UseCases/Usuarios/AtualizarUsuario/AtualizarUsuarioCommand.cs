@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Desbravadores.Gestao.Application.UseCases.Usuarios.AtualizarUsuario;
 
-public sealed record AtualizarUsuarioCommand(Usuario command) : IRequest<UsuarioDTO>;
+public sealed record AtualizarUsuarioCommand(Usuario Command) : IRequest<UsuarioDTO>;

@@ -2,7 +2,7 @@
 
 namespace Desbravadores.Gestao.Application.UseCases.Auth.Me;
 
-public class MeQueryValidator : AbstractValidator<MeQuery>
+internal class MeQueryValidator : AbstractValidator<MeQuery>
 {
   public MeQueryValidator()
   {

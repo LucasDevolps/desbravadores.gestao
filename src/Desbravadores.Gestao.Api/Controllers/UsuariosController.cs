@@ -33,20 +33,20 @@ public sealed class UsuariosController(IMediator mediator) : Controller
     return CreatedAtAction(nameof(ObterPorId), new { id }, new { id });
   }
 
-  [AllowAnonymous]
-  [HttpPost("publicos")]
-  [Consumes("application/json")]
-  [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status201Created)]
-  [ProducesResponseType(StatusCodes.Status400BadRequest)]
-  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-  [ProducesResponseType(StatusCodes.Status403Forbidden)]
-  public async Task<IActionResult> CriarUsuarioPublicos(
-        [FromBody] CriarUsuarioCommand command,
-        CancellationToken cancellationToken = default)
-  {
-    var id = await _mediator.Send(command, cancellationToken);
-    return CreatedAtAction(nameof(ObterPorId), new { id }, new { id });
-  }
+  //[AllowAnonymous]
+  //[HttpPost("publicos")]
+  //[Consumes("application/json")]
+  //[ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status201Created)]
+  //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+  //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  //[ProducesResponseType(StatusCodes.Status403Forbidden)]
+  //public async Task<IActionResult> CriarUsuarioPublicos(
+  //      [FromBody] CriarUsuarioCommand command,
+  //      CancellationToken cancellationToken = default)
+  //{
+  //  var id = await _mediator.Send(command, cancellationToken);
+  //  return CreatedAtAction(nameof(ObterPorId), new { id }, new { id });
+  //}
 
   [Authorize(Policy = "Financeiro")]
   [HttpGet]
@@ -73,6 +73,7 @@ public sealed class UsuariosController(IMediator mediator) : Controller
     var response = await _mediator.Send(query, cancellationToken);
     return Ok(response);
   }
+
   [Authorize(Policy = "MasterOnly")]
   [HttpDelete("{id:guid}")]
   [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status204NoContent)]
@@ -87,7 +88,9 @@ public sealed class UsuariosController(IMediator mediator) : Controller
     await _mediator.Send(command, cancellationToken);
     return NoContent();
   }
+
   [Authorize(Policy = "MasterOnly")]
+  [Consumes("application/json")]
   [HttpPut]
   [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status200OK)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]

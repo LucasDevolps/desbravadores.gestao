@@ -8,17 +8,19 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services
-    .AddControllers()
-    .AddJsonOptions(options =>
-    {
-      options
-        .JsonSerializerOptions
-        .Converters
-        .Add(
-          new JsonStringEnumConverter()
-        );
-    });
+builder
+  .Services
+  .AddControllers()
+  .AddJsonOptions(options =>
+  {
+    options
+      .JsonSerializerOptions
+      .Converters
+      .Add(
+        new JsonStringEnumConverter()
+      );
+  });
+
 if (!builder.Environment.IsDevelopment())
 {
   var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
@@ -33,7 +35,7 @@ builder.Services.AddInfrastructure();
 
 builder.Services.AddMediatR(cfg =>
 {
-cfg.RegisterServicesFromAssembly(typeof(ApplicationAssemblyReference).Assembly);
+  cfg.RegisterServicesFromAssembly(typeof(ApplicationAssemblyReference).Assembly);
 });
 
 builder.Services.AddJwtAuthentication();
