@@ -129,8 +129,13 @@ using (var scope = app.Services.CreateScope())
     db.Database.EnsureCreated();
 }
 
+app.UseStaticFiles();
+
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(options =>
+{
+  options.InjectJavascript("/swagger-ui/theme-switcher.js");
+});
 
 app.UseHttpsRedirection();
 
