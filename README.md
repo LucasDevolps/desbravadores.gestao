@@ -1,45 +1,38 @@
 # Desbravadores.Gestao
 
-API REST em **ASP.NET Core 10** para gestão de usuários, autenticação JWT e controle de sessão ativo no banco de dados. O projeto foi estruturado em camadas para manter regra de negócio isolada, facilitar manutenção e deixar a evolução da API previsível.
+API REST em **ASP.NET Core 10** para autenticação JWT, controle de sessão ativa via banco de dados e gestão de usuários com autorização por políticas.
 
-## O que a API entrega hoje
+## Funcionalidades implementadas
 
-- **Autenticação com JWT** (access token + refresh token) na rota de login.
-- **Sessões rastreadas por JTI**: cada login gera sessão persistida e o token só é aceito se a sessão estiver ativa.
-- **Logout com revogação de sessão**: invalida a sessão do token atual.
-- **Endpoint `/auth/me`** para retornar os dados do usuário autenticado.
-- **Gestão completa de usuários**: criar, listar, buscar por ID, atualizar e excluir.
-- **Autorização por políticas e papéis** para restringir endpoints sensíveis.
-- **Validação de entrada com FluentValidation**.
-- **Documentação interativa via Swagger**.
+- Login com JWT (`access token` + `refresh token`).
+- Controle de sessão por `jti` persistido no banco.
+- Revogação de sessão no logout.
+- Endpoint de identidade do usuário autenticado (`/api/auth/Me`).
+- Endpoint para renovação de sessão/token (`/api/auth/refresh`).
+- CRUD de usuários com regras de autorização.
+- Validação de entrada com FluentValidation.
+- Swagger/OpenAPI com tema dark customizado.
 
-## Arquitetura
-
-A solução segue separação clara de responsabilidades:
+## Arquitetura da solução
 
 - `src/Desbravadores.Gestao.Api`  
-  Camada HTTP (controllers, autenticação JWT, políticas de autorização, Swagger e pipeline da aplicação).
+  Camada HTTP: controllers, autenticação/autorização, Swagger, pipeline e tratamento global de exceções.
 
 - `src/Desbravadores.Gestao.Application`  
-  Casos de uso com MediatR (commands/queries), validações e orquestração da regra de aplicação.
+  Casos de uso (MediatR), validações e contratos de aplicação.
 
 - `src/Desbravadores.Gestao.Domain`  
-  Entidades, DTOs, contratos e enumerações de domínio.
+  Entidades, DTOs e enumerações de domínio.
 
 - `src/Desbravadores.Gestao.Infrastructure`  
-  Persistência com Entity Framework Core, repositórios e serviços de segurança (hash de senha e geração de token).
+  EF Core (`AppDbContext`), repositórios, hash de senha e geração de tokens.
 
 - `tests/Desbravadores.Gestao.UnitTests`  
-  Projeto reservado para testes unitários.
+  Projeto de testes unitários.
 
-## Modelo de autorização
+## Perfis e políticas de autorização
 
-A API utiliza autenticação **Bearer JWT** e políticas por role:
-
-- **`MasterOnly`**: permite `DIRETORIA` e `SECRETARIA`.
-- **`Financeiro`**: permite `TESOURARIA` e `DIRETORIA`.
-
-Perfis definidos no domínio:
+### Roles disponíveis
 
 - `DIRETORA`
 - `SECRETARIA`
@@ -47,107 +40,102 @@ Perfis definidos no domínio:
 - `DIRETORIA`
 - `DESBRAVADOR`
 
+### Políticas configuradas
+
+- `MasterOnly`: `DIRETORIA` e `SECRETARIA`.
+- `Financeiro`: `TESOURARIA` e `DIRETORIA`.
+
 ## Fluxo de autenticação e sessão
 
-1. O usuário autentica via `POST /api/auth/login`.
-2. A API valida credenciais, revoga sessões ativas anteriores do mesmo usuário e cria uma nova sessão.
-3. O token inclui `sub` (UUID do usuário), `jti`, `email`, `name` e `role`.
-4. A cada requisição autenticada, além da validação padrão do JWT, a API verifica no banco se aquela sessão (`jti`) ainda está ativa.
-5. Em `POST /api/auth/logout`, a sessão atual é revogada.
+1. Usuário autentica em `POST /api/auth/login`.
+2. Sessões ativas anteriores do usuário são revogadas.
+3. Nova sessão é criada no banco com `jti`, refresh token e expiração.
+4. Em cada request autenticada, além da validação JWT, a API valida se a sessão está ativa no banco.
+5. `POST /api/auth/logout` revoga a sessão atual.
+6. `GET /api/auth/refresh` gera novos tokens para sessão autenticada.
 
-## Endpoints disponíveis
+## Endpoints atuais
 
-### Autenticação
+## Autenticação (`/api/auth`)
 
-- `POST /api/auth/login`  
-  Realiza login e retorna token + metadados de sessão.
+- `POST /login` (anônimo)
+- `POST /logout` (autenticado)
+- `GET /Me` (autenticado)
+- `GET /refresh` (autenticado)
 
-- `POST /api/auth/logout` _(autenticado)_  
-  Revoga a sessão atual.
+## Usuários (`/api/usuarios`)
 
-- `GET /api/auth/me` _(autenticado)_  
-  Retorna os dados do usuário autenticado.
+> O controller é protegido por `[Authorize]`.
 
-### Usuários
+- `POST /` — política `MasterOnly`
+- `GET /` — política `Financeiro`
+- `GET /{id:guid}` — política `MasterOnly`
+- `PUT /` — política `MasterOnly`
+- `DELETE /{id:guid}` — política `MasterOnly`
 
-- `POST /api/usuarios` _(política `MasterOnly`)_  
-  Cria usuário.
+> Observação: o endpoint `POST /api/usuarios/publicos` está comentado no código neste momento.
 
-- `POST /api/usuarios/publicos` _(anônimo)_  
-  Cria usuário sem exigir autenticação.
+## Variáveis de ambiente
 
-- `GET /api/usuarios` _(política `Financeiro`)_  
-  Lista usuários.
+## JWT
 
-- `GET /api/usuarios/{id}` _(política `MasterOnly`)_  
-  Busca usuário por UUID.
+Obrigatórias:
 
-- `PUT /api/usuarios` _(política `MasterOnly`)_  
-  Atualiza usuário.
+- `JWT_KEY`
+- `JWT_ISSUER`
+- `JWT_AUDIENCE`
 
-- `DELETE /api/usuarios/{id}` _(política `MasterOnly`)_  
-  Remove usuário.
+Opcionais:
 
-## Tecnologias e padrões adotados
+- `Jwt_ExpiresInMinutes` (padrão: `60`)
+- `Jwt_RefreshTokenDays` (padrão: `7`)
 
-- .NET 10 / ASP.NET Core Web API
-- MediatR
-- Entity Framework Core
-- FluentValidation
-- JWT Bearer Authentication
-- Swagger / OpenAPI
-- Arquitetura em camadas (API, Application, Domain, Infrastructure)
+## Banco de dados
 
-## Configuração por variáveis de ambiente
+A seleção do provider é por ambiente:
 
-### Banco de dados
+- `ASPNETCORE_ENVIRONMENT=Development`:
+  - usa **SQL Server**
+  - connection string em `DefaultConnectionDesbravadores`
 
-A infraestrutura escolhe o provider com base no ambiente:
+- demais ambientes:
+  - usa **PostgreSQL**
+  - connection string em `ConnectionStrings__DefaultConnection`
 
-- **Development**: usa **SQL Server** com `DefaultConnectionDesbravadores`.
-- **Demais ambientes**: usa **PostgreSQL** com `ConnectionStrings__DefaultConnection`.
+## Execução local
 
-### Segurança JWT
+## Com .NET SDK
 
-- `JWT_KEY` (obrigatória)
-- `JWT_ISSUER` (obrigatória)
-- `JWT_AUDIENCE` (obrigatória)
-- `Jwt_ExpiresInMinutes` (opcional, padrão: `60`)
-- `Jwt_RefreshTokenDays` (opcional, padrão: `7`)
-
-## Como executar localmente
-
-### Opção 1 — com .NET SDK
-
-1. Configure as variáveis de ambiente.
-2. Execute a API:
+1. Defina as variáveis de ambiente obrigatórias.
+2. Execute:
 
 ```bash
 dotnet run --project src/Desbravadores.Gestao.Api
 ```
 
-A aplicação sobe na porta definida por `PORT` (padrão `10000`) e expõe Swagger em `/swagger`.
+Com profile local, a aplicação usa `http://localhost:5009` (e `https://localhost:7269` no profile https). Fora de desenvolvimento, usa `PORT` (padrão `10000`).
 
-### Opção 2 — com Docker Compose
+## Com Docker Compose
 
 ```bash
 docker compose up --build
 ```
 
-Nesse cenário:
+Serviços do compose atual:
 
-- SQL Server sobe em `localhost:1433`
-- API sobe em `http://localhost:8080`
+- SQL Server: `localhost:1433`
+- Nginx (proxy da API): `http://localhost:8080`
 
-## Tratamento de erros
+## Tratamento global de erros
 
-A API possui tratamento global de exceções e converte falhas de negócio em respostas HTTP consistentes:
+Mapeamentos configurados no pipeline:
 
 - `UnauthorizedAccessException` → `401 Unauthorized`
-- `KeyNotFoundException` / `InvalidOperationException` → `404 Not Found`
-- Demais exceções → `400 Bad Request`
+- `KeyNotFoundException` → `404 Not Found`
+- `InvalidOperationException` → `400 Bad Request`
+- Demais exceções → `400 Bad Request` com mensagem genérica
 
 ## Autor
 
 Lucas de Souza  
-IASD Joaniza 
+IASD Joaniza
