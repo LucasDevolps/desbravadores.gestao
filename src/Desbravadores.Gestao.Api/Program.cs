@@ -132,10 +132,11 @@ using (var scope = app.Services.CreateScope())
 app.UseStaticFiles();
 
 app.UseSwagger();
-app.UseSwaggerUI(options =>
+app.UseSwaggerUI((options) =>
 {
-  options.InjectStylesheet("/swagger-ui/dark-overrides.css");
-  options.InjectJavascript("/swagger-ui/theme-switcher.js");
+  options.HeadContent = """
+    <link rel="stylesheet" type="text/css" href="/css/dark-swagger.css?v=20260428-2">
+    """;
 });
 
 app.UseHttpsRedirection();
