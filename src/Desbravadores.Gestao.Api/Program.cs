@@ -139,6 +139,12 @@ app.UseSwaggerUI((options) =>
     """;
 });
 
+app.MapGet("/", context =>
+{
+  context.Response.Redirect("/swagger");
+  return Task.CompletedTask;
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
