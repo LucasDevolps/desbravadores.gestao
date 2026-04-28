@@ -1,0 +1,101 @@
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  .swagger-ui,
+  .swagger-ui .wrapper,
+  .swagger-ui .scheme-container,
+  .swagger-ui .information-container {
+    background: #111827 !important;
+    color: #e5e7eb !important;
+  }
+
+  .swagger-ui .topbar,
+  .swagger-ui .topbar-wrapper {
+    background: #0f172a !important;
+  }
+
+  .swagger-ui .info .title,
+  .swagger-ui .info p,
+  .swagger-ui .info li,
+  .swagger-ui .info a,
+  .swagger-ui .opblock-tag,
+  .swagger-ui .opblock-summary-description,
+  .swagger-ui .response-col_status,
+  .swagger-ui .response-col_description,
+  .swagger-ui .parameter__name,
+  .swagger-ui .parameter__type,
+  .swagger-ui .model-title,
+  .swagger-ui .model,
+  .swagger-ui .tab li,
+  .swagger-ui section.models h4,
+  .swagger-ui section.models h5,
+  .swagger-ui .prop-name,
+  .swagger-ui .response-control-media-type__title,
+  .swagger-ui label,
+  .swagger-ui small,
+  .swagger-ui .markdown p,
+  .swagger-ui .markdown code {
+    color: #e5e7eb !important;
+  }
+
+  .swagger-ui .opblock,
+  .swagger-ui .opblock .opblock-summary,
+  .swagger-ui .opblock-body,
+  .swagger-ui .responses-inner,
+  .swagger-ui .model-box,
+  .swagger-ui .highlight-code,
+  .swagger-ui .microlight,
+  .swagger-ui .parameters-col_description input,
+  .swagger-ui textarea,
+  .swagger-ui input[type='text'],
+  .swagger-ui input[type='password'],
+  .swagger-ui input[type='email'],
+  .swagger-ui input[type='number'],
+  .swagger-ui select,
+  .swagger-ui .dialog-ux .modal-ux,
+  .swagger-ui .dialog-ux .modal-ux-content,
+  .swagger-ui .dialog-ux .modal-ux-header,
+  .swagger-ui .dialog-ux .modal-ux-body,
+  .swagger-ui table,
+  .swagger-ui table thead tr td,
+  .swagger-ui table thead tr th,
+  .swagger-ui table tbody tr td,
+  .swagger-ui section.models,
+  .swagger-ui .auth-wrapper {
+    background: #1f2937 !important;
+    color: #e5e7eb !important;
+    border-color: #374151 !important;
+  }
+
+  .swagger-ui .btn,
+  .swagger-ui .btn.authorize,
+  .swagger-ui .authorize svg,
+  .swagger-ui .opblock-control-arrow,
+  .swagger-ui select,
+  .swagger-ui input::placeholder,
+  .swagger-ui textarea::placeholder {
+    color: #d1d5db !important;
+    fill: #d1d5db !important;
+  }
+
+  .swagger-ui .btn,
+  .swagger-ui .btn.try-out__btn,
+  .swagger-ui .btn.execute,
+  .swagger-ui .btn.cancel,
+  .swagger-ui .download-contents,
+  .swagger-ui .authorization__btn {
+    border-color: #4b5563 !important;
+  }
+
+  .swagger-ui .responses-table .response,
+  .swagger-ui .response,
+  .swagger-ui .opblock-description-wrapper,
+  .swagger-ui .opblock-external-docs-wrapper,
+  .swagger-ui .opblock-title_normal {
+    color: #e5e7eb !important;
+  }
+}

@@ -134,6 +134,7 @@ app.UseStaticFiles();
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
+  options.InjectStylesheet("/swagger-ui/dark-overrides.css");
   options.InjectJavascript("/swagger-ui/theme-switcher.js");
 });
 
