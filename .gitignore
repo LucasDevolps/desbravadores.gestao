@@ -63,3 +63,4 @@ src/Desbravadores.Gestao.Api/Desbravadores.Gestao.Api.csproj.user
 *.Api.csproj.user
 src/Desbravadores.Gestao.Infrastructure/DependencyInjection.cs
 src/Desbravadores.Gestao.Api/Program.cs
+docs/[Ww][Ii][Kk][Ii].md
