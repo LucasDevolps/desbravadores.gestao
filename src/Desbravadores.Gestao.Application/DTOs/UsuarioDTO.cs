@@ -2,7 +2,7 @@
 using Desbravadores.Gestao.Domain.Entities;
 using MediatR;
 
-namespace Desbravadores.Gestao.Domain.DTOs;
+namespace Desbravadores.Gestao.Application.DTOs;
 
 public sealed class UsuarioDTO() : IRequest<IEnumerable<UsuarioDTO>>
 {

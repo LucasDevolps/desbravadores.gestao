@@ -1,4 +1,4 @@
-﻿using Desbravadores.Gestao.Application.Auth.Token;
+﻿using Desbravadores.Gestao.Application.UseCases.Auth.Token;
 using Desbravadores.Gestao.Domain.Entities;
 using System.Security.Cryptography;
 

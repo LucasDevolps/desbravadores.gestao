@@ -1,7 +1,7 @@
-﻿using Desbravadores.Gestao.Domain.Interfaces.Repositories;
+﻿using Desbravadores.Gestao.Application.Interfaces;
 using MediatR;
 
-namespace Desbravadores.Gestao.Application.Auth.Logout;
+namespace Desbravadores.Gestao.Application.UseCases.Auth.Logout;
 
 public sealed class LogoutRequestCommandHandler(IUsuarioSessaoRepository usuarioSessaoRepository) :IRequestHandler<LogoutCommand, Unit>
 {

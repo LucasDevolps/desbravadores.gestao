@@ -1,6 +1,5 @@
 ﻿using Desbravadores.Gestao.Application.Interfaces;
-using Desbravadores.Gestao.Domain.DTOs;
-using Desbravadores.Gestao.Domain.Interfaces.Repositories;
+using Desbravadores.Gestao.Application.DTOs;
 using MediatR;
 
 namespace Desbravadores.Gestao.Application.UseCases.Auth.Me;

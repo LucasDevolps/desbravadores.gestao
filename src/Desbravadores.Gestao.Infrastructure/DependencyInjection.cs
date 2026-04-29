@@ -1,5 +1,4 @@
 using Desbravadores.Gestao.Application.Interfaces;
-using Desbravadores.Gestao.Domain.Interfaces.Repositories;
 using Desbravadores.Gestao.Infrastructure.Data;
 using Desbravadores.Gestao.Infrastructure.Repositories;
 using Desbravadores.Gestao.Infrastructure.Security;

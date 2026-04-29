@@ -1,5 +1,5 @@
 ﻿using Desbravadores.Gestao.Domain.Entities;
-using Desbravadores.Gestao.Domain.Interfaces.Repositories;
+using Desbravadores.Gestao.Application.Interfaces;
 using Desbravadores.Gestao.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 

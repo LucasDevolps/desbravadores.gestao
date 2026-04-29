@@ -1,4 +1,4 @@
-﻿namespace Desbravadores.Gestao.Application.Auth.Token;
+﻿namespace Desbravadores.Gestao.Application.UseCases.Auth.Token;
 
 public sealed record TokenResult(
     string AccessToken,

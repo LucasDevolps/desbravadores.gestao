@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Desbravadores.Gestao.Application.Auth.Refresh;
+namespace Desbravadores.Gestao.Application.UseCases.Auth.Refresh;
 
 internal class RefreshQueryValidator : AbstractValidator<RefreshQuery>
 {

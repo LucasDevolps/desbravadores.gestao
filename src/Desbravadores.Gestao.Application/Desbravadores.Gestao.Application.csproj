@@ -1,12 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <Compile Remove="Auth\Me\**" />
-    <EmbeddedResource Remove="Auth\Me\**" />
-    <None Remove="Auth\Me\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Desbravadores.Gestao.Domain\Desbravadores.Gestao.Domain.csproj" />
   </ItemGroup>
 

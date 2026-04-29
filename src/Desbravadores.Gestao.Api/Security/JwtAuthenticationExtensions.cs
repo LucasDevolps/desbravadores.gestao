@@ -1,5 +1,4 @@
 using Desbravadores.Gestao.Application.Interfaces;
-using Desbravadores.Gestao.Domain.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
