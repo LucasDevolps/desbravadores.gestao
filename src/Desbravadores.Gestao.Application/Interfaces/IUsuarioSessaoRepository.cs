@@ -1,6 +1,6 @@
 ﻿using Desbravadores.Gestao.Domain.Entities;
 
-namespace Desbravadores.Gestao.Domain.Interfaces.Repositories;
+namespace Desbravadores.Gestao.Application.Interfaces;
 
 public interface IUsuarioSessaoRepository
 {

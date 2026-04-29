@@ -3,7 +3,7 @@ using Desbravadores.Gestao.Application.UseCases.Usuarios.BuscaPorId;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.DeletarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.GetAll;
-using Desbravadores.Gestao.Domain.DTOs;
+using Desbravadores.Gestao.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

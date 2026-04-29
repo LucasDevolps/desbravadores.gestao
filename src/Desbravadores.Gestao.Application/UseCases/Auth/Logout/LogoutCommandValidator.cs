@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Desbravadores.Gestao.Application.Auth.Logout;
+namespace Desbravadores.Gestao.Application.UseCases.Auth.Logout;
 
 internal sealed class LogoutCommandValidator : AbstractValidator<LogoutCommand>
 {

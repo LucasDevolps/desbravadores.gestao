@@ -1,10 +1,9 @@
-﻿using Desbravadores.Gestao.Application.Auth.Token;
+﻿using Desbravadores.Gestao.Application.UseCases.Auth.Token;
 using Desbravadores.Gestao.Application.Interfaces;
 using Desbravadores.Gestao.Domain.Entities;
-using Desbravadores.Gestao.Domain.Interfaces.Repositories;
 using MediatR;
 
-namespace Desbravadores.Gestao.Application.Auth.Login;
+namespace Desbravadores.Gestao.Application.UseCases.Auth.Login;
 
 public sealed class LoginCommandHandler(
     IUsuarioRepository usuarioRepository,

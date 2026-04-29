@@ -1,6 +1,6 @@
-﻿using Desbravadores.Gestao.Application.Auth.Login;
-using Desbravadores.Gestao.Application.Auth.Logout;
-using Desbravadores.Gestao.Application.Auth.Refresh;
+﻿using Desbravadores.Gestao.Application.UseCases.Auth.Login;
+using Desbravadores.Gestao.Application.UseCases.Auth.Logout;
+using Desbravadores.Gestao.Application.UseCases.Auth.Refresh;
 using Desbravadores.Gestao.Application.UseCases.Auth.Me;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.AtualizarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.BuscaPorId;

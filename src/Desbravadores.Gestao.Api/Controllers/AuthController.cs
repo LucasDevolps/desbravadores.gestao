@@ -1,8 +1,8 @@
-﻿using Desbravadores.Gestao.Application.Auth.Login;
-using Desbravadores.Gestao.Application.Auth.Logout;
-using Desbravadores.Gestao.Application.Auth.Refresh;
+﻿using Desbravadores.Gestao.Application.UseCases.Auth.Login;
+using Desbravadores.Gestao.Application.UseCases.Auth.Logout;
+using Desbravadores.Gestao.Application.UseCases.Auth.Refresh;
 using Desbravadores.Gestao.Application.UseCases.Auth.Me;
-using Desbravadores.Gestao.Domain.DTOs;
+using Desbravadores.Gestao.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

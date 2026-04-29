@@ -1,4 +1,4 @@
-﻿using Desbravadores.Gestao.Domain.DTOs;
+﻿using Desbravadores.Gestao.Application.DTOs;
 using Desbravadores.Gestao.Domain.Entities;
 using MediatR;
 

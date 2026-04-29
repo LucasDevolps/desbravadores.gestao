@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Desbravadores.Gestao.Application.Auth.Refresh;
+namespace Desbravadores.Gestao.Application.UseCases.Auth.Refresh;
 
 public sealed record RefreshQuery(
     string Sub,

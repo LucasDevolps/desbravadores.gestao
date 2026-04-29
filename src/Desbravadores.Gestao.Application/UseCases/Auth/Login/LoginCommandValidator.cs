@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Desbravadores.Gestao.Application.Auth.Login;
+namespace Desbravadores.Gestao.Application.UseCases.Auth.Login;
 
 internal sealed class LoginCommandValidator : AbstractValidator<LoginCommand>
 {
