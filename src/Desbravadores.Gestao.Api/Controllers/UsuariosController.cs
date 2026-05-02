@@ -91,15 +91,24 @@ public sealed class UsuariosController(IMediator mediator) : Controller
 
   [Authorize(Policy = "MasterOnly")]
   [Consumes("application/json")]
-  [HttpPut]
+  [HttpPatch("{id:guid}")]
   [ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status200OK)]
   [ProducesResponseType(StatusCodes.Status401Unauthorized)]
   [ProducesResponseType(StatusCodes.Status403Forbidden)]
   [ProducesResponseType(StatusCodes.Status404NotFound)]
   public async Task<IActionResult> AtualizarUsuario(
+    [FromRoute] Guid id,
     [FromBody] AtualizarUsuarioCommand command,
     CancellationToken cancellationToken = default)
   {
+    command = new AtualizarUsuarioCommand(
+      id,
+      command.Nome,
+      command.Email,
+      command.Senha,
+      command.Roles
+    );
+
     var response = await _mediator.Send(command, cancellationToken);
     return Ok(response);
   }

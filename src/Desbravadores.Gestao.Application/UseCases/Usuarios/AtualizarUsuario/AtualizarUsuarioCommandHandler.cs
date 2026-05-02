@@ -1,23 +1,59 @@
-﻿using Desbravadores.Gestao.Application.Interfaces;
-using Desbravadores.Gestao.Application.DTOs;
+﻿using Desbravadores.Gestao.Application.DTOs;
+using Desbravadores.Gestao.Application.Interfaces;
+using Desbravadores.Gestao.Domain.Constants;
+using Desbravadores.Gestao.Domain.Entities;
 using MediatR;
 
 namespace Desbravadores.Gestao.Application.UseCases.Usuarios.AtualizarUsuario;
 
-public sealed class AtualizarUsuarioCommandHandler
-(IUsuarioRepository usuarioRepository) 
-: IRequestHandler<AtualizarUsuarioCommand, UsuarioDTO>
+public sealed class AtualizarUsuarioCommandHandler(
+    IUsuarioRepository usuarioRepository,
+    IPasswordHasher passwordHasher)
+    : IRequestHandler<AtualizarUsuarioCommand, UsuarioDTO>
 {
   private readonly IUsuarioRepository _usuarioRepository = usuarioRepository;
-  public async Task<UsuarioDTO> Handle(AtualizarUsuarioCommand request, CancellationToken cancellationToken)
+  private readonly IPasswordHasher _passwordHasher = passwordHasher;
+
+  public async Task<UsuarioDTO> Handle(
+      AtualizarUsuarioCommand request,
+      CancellationToken cancellationToken)
   {
-    var usuario = await _usuarioRepository.GetByIdAsync(request.Command.Uuid, cancellationToken);
+    var usuario = await _usuarioRepository.GetByUuidAsync(request.Uuid, cancellationToken)
+        ?? throw new KeyNotFoundException("Usuário não encontrado.");
 
-    if (usuario is null)
-      throw new KeyNotFoundException("Usuario não encontrado");
+    if (!string.IsNullOrWhiteSpace(request.Nome))
+      usuario.AtualizarNome(request.Nome);
 
-    await _usuarioRepository.UpdateAsync(request.Command, cancellationToken); 
-    
-    return usuario;
+    if (!string.IsNullOrWhiteSpace(request.Email))
+    {
+      var emailNormalizado = request.Email.Trim().ToLowerInvariant();
+
+      var usuarioComMesmoEmail = await _usuarioRepository.GetByEmailAsync(
+          emailNormalizado,
+          cancellationToken);
+
+      if (usuarioComMesmoEmail is not null && usuarioComMesmoEmail.Uuid != usuario.Uuid)
+        throw new InvalidOperationException("Já existe um usuário com este e-mail.");
+
+      usuario.AtualizarEmail(emailNormalizado);
+    }
+
+    if (!string.IsNullOrWhiteSpace(request.Senha))
+    {
+      var senhaHash = await _passwordHasher.HashAsync(request.Senha, cancellationToken);
+      usuario.AtualizarSenha(senhaHash);
+    }
+
+    if (!string.IsNullOrWhiteSpace(request.Roles))
+    {
+      if (!Enum.TryParse<Roles>(request.Roles, true, out var role))
+        throw new InvalidOperationException("Role inválida.");
+
+      usuario.AtualizarRole(role);
+    }
+
+    await _usuarioRepository.SaveChangesAsync(cancellationToken);
+
+    return new UsuarioDTO().FromEntity(usuario);
   }
 }
