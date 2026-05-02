@@ -37,5 +37,24 @@ public sealed class Usuario
     Senha = senha;
     Role = role;
   }
+  public void AtualizarNome(string nome)
+  {
+    Nome = nome.Trim();
+  }
+
+  public void AtualizarEmail(string email)
+  {
+    Email = email.Trim().ToLowerInvariant();
+  }
+
+  public void AtualizarSenha(string senhaHash)
+  {
+    Senha = senhaHash;
+  }
+
+  public void AtualizarRole(Roles role)
+  {
+    Role = role;
+  }
 
 }
