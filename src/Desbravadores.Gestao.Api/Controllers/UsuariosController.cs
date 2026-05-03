@@ -33,21 +33,6 @@ public sealed class UsuariosController(IMediator mediator) : Controller
     return CreatedAtAction(nameof(ObterPorId), new { id }, new { id });
   }
 
-  //[AllowAnonymous]
-  //[HttpPost("publicos")]
-  //[Consumes("application/json")]
-  //[ProducesResponseType(typeof(UsuarioDTO), StatusCodes.Status201Created)]
-  //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-  //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-  //[ProducesResponseType(StatusCodes.Status403Forbidden)]
-  //public async Task<IActionResult> CriarUsuarioPublicos(
-  //      [FromBody] CriarUsuarioCommand command,
-  //      CancellationToken cancellationToken = default)
-  //{
-  //  var id = await _mediator.Send(command, cancellationToken);
-  //  return CreatedAtAction(nameof(ObterPorId), new { id }, new { id });
-  //}
-
   [Authorize(Policy = "Financeiro")]
   [HttpGet]
   [ProducesResponseType(typeof(IEnumerable<UsuarioDTO>), StatusCodes.Status200OK)]
