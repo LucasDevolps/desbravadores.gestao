@@ -2,6 +2,7 @@ using Desbravadores.Gestao.Api.Security;
 using Desbravadores.Gestao.Application;
 using Desbravadores.Gestao.Infrastructure;
 using Desbravadores.Gestao.Infrastructure.Data;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
@@ -104,6 +105,20 @@ var app = builder.Build();
                 Message = exception.Message
               });
               break;
+
+            case ValidationException validationException:
+              context.Response.StatusCode = StatusCodes.Status400BadRequest;
+              await context.Response.WriteAsJsonAsync(new
+              {
+                Message = "Erro de validação.",
+                Errors = validationException.Errors.Select(error => new
+                {
+                  error.PropertyName,
+                  error.ErrorMessage
+                })
+              });
+              break;
+
             case InvalidOperationException:
               context.Response.StatusCode = StatusCodes.Status400BadRequest;
               await context.Response.WriteAsJsonAsync(new

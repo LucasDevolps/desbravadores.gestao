@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 
-internal sealed class CriarUsuarioCommandValidator : AbstractValidator<CriarUsuarioCommand>
+public sealed class CriarUsuarioCommandValidator : AbstractValidator<CriarUsuarioCommand>
 {
   public CriarUsuarioCommandValidator()
   {
@@ -23,8 +23,7 @@ internal sealed class CriarUsuarioCommandValidator : AbstractValidator<CriarUsua
 
     RuleFor(x => x.Roles)
       .NotEmpty()
-      .IsInEnum()
-      .Must(role => Enum.TryParse(typeof(Roles), role, true, out _))
+      .Must(role => Enum.TryParse<Roles>(role, true, out _))
       .WithMessage("Role inválida.");
   }
 }

@@ -1,4 +1,5 @@
 ﻿using Desbravadores.Gestao.Application.UseCases.Auth.Login;
+using Desbravadores.Gestao.Application.Common.Behaviors;
 using Desbravadores.Gestao.Application.UseCases.Auth.Logout;
 using Desbravadores.Gestao.Application.UseCases.Auth.Refresh;
 using Desbravadores.Gestao.Application.UseCases.Auth.Me;
@@ -8,6 +9,7 @@ using Desbravadores.Gestao.Application.UseCases.Usuarios.CriarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.DeletarUsuario;
 using Desbravadores.Gestao.Application.UseCases.Usuarios.GetAll;
 using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Desbravadores.Gestao.Application;
@@ -16,6 +18,8 @@ public static class DependencyInjection
 {
   public static IServiceCollection AddApplication(this IServiceCollection services)
   {
+    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
     /*
      *  Auth
     */ 

@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
 
+using Desbravadores.Gestao.Domain.Constants;
+
 namespace Desbravadores.Gestao.Application.UseCases.Usuarios.AtualizarUsuario;
 
 internal sealed class AtualizarUsuarioCommandValidator : AbstractValidator<AtualizarUsuarioCommand>
@@ -22,5 +24,9 @@ internal sealed class AtualizarUsuarioCommandValidator : AbstractValidator<Atual
     RuleFor(x => x.Senha)
         .MinimumLength(6).WithMessage("A senha do usuário deve ter no mínimo 6 caracteres.")
         .MaximumLength(100).WithMessage("A senha do usuário deve ter no máximo 100 caracteres.");
+
+    RuleFor(x => x.Roles)
+        .Must(role => string.IsNullOrWhiteSpace(role) || Enum.TryParse<Roles>(role, true, out _))
+        .WithMessage("Role inválida.");
   }
 }
