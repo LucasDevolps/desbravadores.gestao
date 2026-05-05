@@ -154,7 +154,9 @@ internal sealed class FakePasswordHasher : IPasswordHasher
 {
   public List<string> SenhasHasheadas { get; } = [];
   public List<(string Password, string PasswordHash)> Verificacoes { get; } = [];
+  public List<string> RehashChecks { get; } = [];
   public bool VerifyResultado { get; set; } = true;
+  public bool NeedsRehashResultado { get; set; }
 
   public Task<string> HashAsync(string password, CancellationToken cancellationToken = default)
   {
@@ -166,6 +168,12 @@ internal sealed class FakePasswordHasher : IPasswordHasher
   {
     Verificacoes.Add((password, passwordHash));
     return Task.FromResult(VerifyResultado);
+  }
+
+  public bool NeedsRehash(string passwordHash)
+  {
+    RehashChecks.Add(passwordHash);
+    return NeedsRehashResultado;
   }
 }
 
