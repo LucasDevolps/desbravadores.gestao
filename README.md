@@ -89,6 +89,7 @@ Opcionais:
 
 - `Jwt_ExpiresInMinutes` (padrão: `60`)
 - `Jwt_RefreshTokenDays` (padrão: `7`)
+- `PASSWORD_PEPPER` (recomendado para produção; mantenha o mesmo valor para não invalidar senhas já geradas com pepper)
 
 ## Banco de dados
 

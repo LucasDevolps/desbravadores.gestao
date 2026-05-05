@@ -20,13 +20,50 @@ public sealed class SecurityTests
   [Fact]
   public async Task PasswordHasher_hashes_and_verifies_passwords()
   {
-    var hasher = new PasswordHasher();
+    var hasher = new PasswordHasher(pepper: null);
 
     var hash = await hasher.HashAsync("123456");
 
+    Assert.StartsWith("desb:bcrypt-sha384:v2:", hash);
+    Assert.Contains("$12$", hash);
     Assert.NotEqual("123456", hash);
     Assert.True(await hasher.VerifyAsync("123456", hash));
     Assert.False(await hasher.VerifyAsync("wrong", hash));
+    Assert.False(hasher.NeedsRehash(hash));
+  }
+
+  [Fact]
+  public async Task PasswordHasher_verifies_legacy_bcrypt_hashes()
+  {
+    var hasher = new PasswordHasher(pepper: null);
+    var legacyHash = BCrypt.Net.BCrypt.HashPassword("123456", 4);
+
+    Assert.True(await hasher.VerifyAsync("123456", legacyHash));
+    Assert.False(await hasher.VerifyAsync("wrong", legacyHash));
+    Assert.True(hasher.NeedsRehash(legacyHash));
+  }
+
+  [Fact]
+  public async Task PasswordHasher_uses_pepper_when_configured()
+  {
+    var hasher = new PasswordHasher("pepper-secreto");
+
+    var hash = await hasher.HashAsync("123456");
+
+    Assert.StartsWith("desb:bcrypt-sha384-pepper:v2:", hash);
+    Assert.True(await hasher.VerifyAsync("123456", hash));
+    Assert.False(await new PasswordHasher("outro-pepper").VerifyAsync("123456", hash));
+    Assert.False(await new PasswordHasher(pepper: null).VerifyAsync("123456", hash));
+    Assert.False(hasher.NeedsRehash(hash));
+  }
+
+  [Fact]
+  public async Task PasswordHasher_handles_invalid_hash_as_failed_verification()
+  {
+    var hasher = new PasswordHasher(pepper: null);
+
+    Assert.False(await hasher.VerifyAsync("123456", "hash-invalido"));
+    Assert.True(hasher.NeedsRehash("hash-invalido"));
   }
 
   [Fact]

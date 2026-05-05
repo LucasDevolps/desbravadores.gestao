@@ -48,6 +48,37 @@ public sealed class AuthHandlersTests
     Assert.Equal("refresh-token", sessao.RefreshToken);
     Assert.Equal(1, sessoes.SaveChangesChamadas);
     Assert.Equal(("123456", "stored-hash"), Assert.Single(passwordHasher.Verificacoes));
+    Assert.Equal("stored-hash", Assert.Single(passwordHasher.RehashChecks));
+  }
+
+  [Fact]
+  public async Task Login_rehashes_password_when_stored_hash_is_outdated()
+  {
+    var usuario = UsuarioTestFactory.Create(
+      id: 42,
+      email: "lucas@email.com",
+      senha: "stored-hash");
+    var usuarios = new FakeUsuarioRepository();
+    usuarios.Usuarios.Add(usuario);
+    var sessoes = new FakeUsuarioSessaoRepository();
+    var passwordHasher = new FakePasswordHasher
+    {
+      VerifyResultado = true,
+      NeedsRehashResultado = true
+    };
+    var handler = new LoginCommandHandler(
+      usuarios,
+      sessoes,
+      new FakeTokenService(),
+      passwordHasher);
+
+    await handler.Handle(new LoginCommand("lucas@email.com", "123456"), CancellationToken.None);
+
+    Assert.Equal("hashed:123456", usuario.Senha);
+    Assert.Equal("stored-hash", Assert.Single(passwordHasher.RehashChecks));
+    Assert.Equal("123456", Assert.Single(passwordHasher.SenhasHasheadas));
+    Assert.Equal(1, usuarios.SaveChangesChamadas);
+    Assert.Single(sessoes.Sessoes);
   }
 
   [Fact]
