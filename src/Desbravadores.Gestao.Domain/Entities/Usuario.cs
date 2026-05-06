@@ -11,9 +11,13 @@ public sealed class Usuario
   public string Email { get; private set; }
   public string Senha { get; private set; }
   public DateOnly DataCriacao { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+  public DateTime? DataAtualizacao { get; private set; }
+  public int? UsuarioLogadoId { get; private set; }
+  public string? IpUsuarioLogado { get; private set; }
   public Roles Role { get; private set; } = Roles.DESBRAVADOR;
 
   public ICollection<UsuarioSessao> Sessoes { get; private set; } = new List<UsuarioSessao>();
+  public Usuario? UsuarioLogado { get; private set; }
 
   public Usuario(string nome, string email, string senha, Roles role = Roles.DESBRAVADOR)
   {
@@ -55,6 +59,20 @@ public sealed class Usuario
   public void AtualizarRole(Roles role)
   {
     Role = role;
+  }
+
+  public void RegistrarAtualizacao(Usuario usuarioLogado, string ipUsuarioLogado)
+  {
+    if (usuarioLogado.Id <= 0)
+      throw new InvalidOperationException("Usuário logado inválido.");
+
+    if (string.IsNullOrWhiteSpace(ipUsuarioLogado))
+      throw new InvalidOperationException("IP do usuário logado é obrigatório.");
+
+    DataAtualizacao = DateTime.UtcNow;
+    UsuarioLogadoId = usuarioLogado.Id;
+    UsuarioLogado = usuarioLogado;
+    IpUsuarioLogado = ipUsuarioLogado.Trim();
   }
 
 }

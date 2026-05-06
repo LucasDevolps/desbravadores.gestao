@@ -136,7 +136,9 @@ public sealed class ValidatorsTests
       "Lucas",
       "lucas@email.com",
       "123456",
-      "SECRETARIA"));
+      "SECRETARIA",
+      "127.0.0.1",
+      Guid.NewGuid()));
 
     Assert.True(result.IsValid);
   }
@@ -151,7 +153,9 @@ public sealed class ValidatorsTests
       "Lucas",
       "lucas@email.com",
       null,
-      " "));
+      " ",
+      "127.0.0.1",
+      Guid.NewGuid()));
 
     Assert.True(result.IsValid);
   }
@@ -166,7 +170,9 @@ public sealed class ValidatorsTests
       null,
       null,
       null,
-      null));
+      null,
+      "127.0.0.1",
+      Guid.NewGuid()));
 
     Assert.False(result.IsValid);
   }
@@ -189,7 +195,9 @@ public sealed class ValidatorsTests
       nome,
       email,
       senha,
-      role));
+      role,
+      "127.0.0.1",
+      Guid.NewGuid()));
 
     Assert.False(result.IsValid);
   }
@@ -204,7 +212,9 @@ public sealed class ValidatorsTests
       "Lucas",
       "lucas@email.com",
       "123456",
-      "SECRETARIA"));
+      "SECRETARIA",
+      "127.0.0.1",
+      Guid.NewGuid()));
 
     Assert.False(result.IsValid);
   }

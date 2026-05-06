@@ -11,6 +11,14 @@ internal sealed class AtualizarUsuarioCommandValidator : AbstractValidator<Atual
     RuleFor(x => x.Uuid)
         .NotEmpty().WithMessage("O Id do usuário é obrigatório.");
 
+    RuleFor(x => x.UsuarioLogado)
+        .NotNull().WithMessage("O usuário logado é obrigatório.")
+        .NotEmpty().WithMessage("O usuário logado é obrigatório.");
+
+    RuleFor(x => x.IpUsuarioLogado)
+        .NotEmpty().WithMessage("O IP do usuário logado é obrigatório.")
+        .MaximumLength(45).WithMessage("O IP do usuário logado deve ter no máximo 45 caracteres.");
+
     RuleFor(x => x.Nome)
         .NotEmpty().WithMessage("O nome do usuário é obrigatório.")
         .MaximumLength(100).WithMessage("O nome do usuário deve ter no máximo 100 caracteres.");

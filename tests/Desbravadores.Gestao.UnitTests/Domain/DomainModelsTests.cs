@@ -1,6 +1,7 @@
 using Desbravadores.Gestao.Application.DTOs;
 using Desbravadores.Gestao.Domain.Constants;
 using Desbravadores.Gestao.Domain.Entities;
+using Desbravadores.Gestao.UnitTests.TestDoubles;
 
 namespace Desbravadores.Gestao.UnitTests.Domain;
 
@@ -21,6 +22,10 @@ public sealed class DomainModelsTests
     Assert.Equal("hash", usuario.Senha);
     Assert.Equal(Roles.DESBRAVADOR, usuario.Role);
     Assert.InRange(usuario.DataCriacao, before, after);
+    Assert.Null(usuario.DataAtualizacao);
+    Assert.Null(usuario.UsuarioLogadoId);
+    Assert.Null(usuario.UsuarioLogado);
+    Assert.Null(usuario.IpUsuarioLogado);
     Assert.Empty(usuario.Sessoes);
   }
 
@@ -39,16 +44,25 @@ public sealed class DomainModelsTests
   public void Usuario_update_methods_normalize_and_replace_values()
   {
     var usuario = new Usuario("Lucas", "lucas@email.com", "hash");
+    var usuarioLogado = UsuarioTestFactory.Create(id: 10);
+    var before = DateTime.UtcNow;
 
     usuario.AtualizarNome("  Novo Nome  ");
     usuario.AtualizarEmail("  NOVO@EMAIL.COM  ");
     usuario.AtualizarSenha("new-hash");
     usuario.AtualizarRole(Roles.DIRETORIA);
+    usuario.RegistrarAtualizacao(usuarioLogado, " 127.0.0.1 ");
+    var after = DateTime.UtcNow;
 
     Assert.Equal("Novo Nome", usuario.Nome);
     Assert.Equal("novo@email.com", usuario.Email);
     Assert.Equal("new-hash", usuario.Senha);
     Assert.Equal(Roles.DIRETORIA, usuario.Role);
+    Assert.NotNull(usuario.DataAtualizacao);
+    Assert.InRange(usuario.DataAtualizacao.Value, before, after);
+    Assert.Equal(usuarioLogado.Id, usuario.UsuarioLogadoId);
+    Assert.Same(usuarioLogado, usuario.UsuarioLogado);
+    Assert.Equal("127.0.0.1", usuario.IpUsuarioLogado);
   }
 
   [Fact]
@@ -113,6 +127,8 @@ public sealed class DomainModelsTests
     Assert.Equal(usuario.Nome, dto.Nome);
     Assert.Equal(usuario.Email, dto.Email);
     Assert.Equal(usuario.DataCriacao, dto.DataCriacao);
+    Assert.Equal(usuario.DataAtualizacao, dto.DataAtualizacao);
+    Assert.Equal(usuario.IpUsuarioLogado, dto.IpUsuarioLogado);
     Assert.Equal(Roles.TESOURARIA, dto.Roles);
   }
 

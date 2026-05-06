@@ -8,5 +8,7 @@ public sealed record AtualizarUsuarioCommand(
     string? Nome,
     string? Email,
     string? Senha,
-    string? Roles
+    string? Roles,
+    string? IpUsuarioLogado = null,
+    Guid? UsuarioLogado = null
 ) : IRequest<UsuarioDTO>;

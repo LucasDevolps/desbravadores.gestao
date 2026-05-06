@@ -18,6 +18,15 @@ public sealed class AtualizarUsuarioCommandHandler(
       AtualizarUsuarioCommand request,
       CancellationToken cancellationToken)
   {
+    if (request.UsuarioLogado is null || request.UsuarioLogado == Guid.Empty)
+      throw new UnauthorizedAccessException("Usuário logado inválido.");
+
+    if (string.IsNullOrWhiteSpace(request.IpUsuarioLogado))
+      throw new InvalidOperationException("IP do usuário logado é obrigatório.");
+
+    var usuarioLogado = await _usuarioRepository.GetByUuidAsync(request.UsuarioLogado.Value, cancellationToken)
+        ?? throw new UnauthorizedAccessException("Usuário logado não encontrado.");
+
     var usuario = await _usuarioRepository.GetByUuidAsync(request.Uuid, cancellationToken)
         ?? throw new KeyNotFoundException("Usuário não encontrado.");
 
@@ -51,6 +60,8 @@ public sealed class AtualizarUsuarioCommandHandler(
 
       usuario.AtualizarRole(role);
     }
+
+    usuario.RegistrarAtualizacao(usuarioLogado, request.IpUsuarioLogado);
 
     await _usuarioRepository.SaveChangesAsync(cancellationToken);
 
