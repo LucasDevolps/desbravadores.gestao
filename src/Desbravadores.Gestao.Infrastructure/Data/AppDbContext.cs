@@ -7,6 +7,7 @@ namespace Desbravadores.Gestao.Infrastructure.Data
   {
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<UsuarioSessao> UsuarioSessoes => Set<UsuarioSessao>();
+    public DbSet<ApiRequestLog> ApiRequestLogs => Set<ApiRequestLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -61,6 +62,33 @@ namespace Desbravadores.Gestao.Infrastructure.Data
               .WithMany()
               .HasForeignKey(x => x.UsuarioLogadoId)
               .OnDelete(DeleteBehavior.Restrict);
+      });
+
+
+      modelBuilder.Entity<ApiRequestLog>(entity =>
+      {
+        entity.ToTable("ApiRequestLogs");
+
+        entity.HasKey(x => x.Id);
+
+        entity.Property(x => x.DataHora).IsRequired();
+        entity.Property(x => x.MetodoHttp).IsRequired().HasMaxLength(12);
+        entity.Property(x => x.Endpoint).IsRequired().HasMaxLength(500);
+        entity.Property(x => x.StatusCode).IsRequired();
+        entity.Property(x => x.TempoExecucaoMs).IsRequired();
+        entity.Property(x => x.Sucesso).IsRequired();
+        entity.Property(x => x.CorrelationId).HasMaxLength(120);
+        entity.Property(x => x.TraceId).HasMaxLength(120);
+        entity.Property(x => x.IpOrigem).HasMaxLength(45);
+        entity.Property(x => x.UsuarioId).HasMaxLength(120);
+        entity.Property(x => x.UsuarioEmail).HasMaxLength(200);
+        entity.Property(x => x.Ambiente).HasMaxLength(64);
+
+        entity.HasIndex(x => x.DataHora);
+        entity.HasIndex(x => x.Endpoint);
+        entity.HasIndex(x => x.StatusCode);
+        entity.HasIndex(x => x.CorrelationId);
+        entity.HasIndex(x => x.TraceId);
       });
 
       modelBuilder.Entity<UsuarioSessao>(entity =>
