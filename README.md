@@ -93,22 +93,29 @@ Opcionais:
 
 ## Banco de dados
 
-A seleção do provider é por ambiente:
+O provider configurado é **PostgreSQL** via Npgsql.
 
-- `ASPNETCORE_ENVIRONMENT=Development`:
-  - usa **SQL Server**
-  - connection string em `DefaultConnectionDesbravadores`
+A aplicação aceita a URL do banco nestas chaves:
 
-- demais ambientes:
-  - usa **PostgreSQL**
-  - connection string em `ConnectionStrings__DefaultConnection`
+- `DATABASE_URL`
+- `ConnectionStrings__DefaultConnection`
+- `ConnectionStrings:DefaultConnection`
+- `DefaultConnectionDesbravadores` (compatibilidade)
+
+URLs no formato `postgresql://usuario:senha@host/database` são convertidas automaticamente para o formato aceito pelo Npgsql, com SSL habilitado.
 
 ## Execução local
 
 ## Com .NET SDK
 
 1. Defina as variáveis de ambiente obrigatórias.
-2. Execute:
+2. Defina `DATABASE_URL` ou salve a conexão em user-secrets:
+
+```bash
+dotnet user-secrets set "DATABASE_URL" "postgresql://usuario:senha@host/database" --project src/Desbravadores.Gestao.Api
+```
+
+3. Execute:
 
 ```bash
 dotnet run --project src/Desbravadores.Gestao.Api
@@ -124,7 +131,7 @@ docker compose up --build
 
 Serviços do compose atual:
 
-- SQL Server: `localhost:1433`
+- API conectada ao PostgreSQL externo configurado por `DATABASE_URL`
 - Nginx (proxy da API): `http://localhost:8080`
 
 ## Tratamento global de erros
