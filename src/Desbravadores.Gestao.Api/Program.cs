@@ -1,3 +1,4 @@
+using Desbravadores.Gestao.Api.Middlewares;
 using Desbravadores.Gestao.Api.Security;
 using Desbravadores.Gestao.Application;
 using Desbravadores.Gestao.Infrastructure;
@@ -137,6 +138,8 @@ var app = builder.Build();
           }
         });
       });
+
+app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
