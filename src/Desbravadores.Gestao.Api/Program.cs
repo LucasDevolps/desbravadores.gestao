@@ -131,7 +131,7 @@ var app = builder.Build();
               context.Response.StatusCode = StatusCodes.Status400BadRequest;
               await context.Response.WriteAsJsonAsync(new
               {
-                Message = exception.Message
+                Message = "Ocorreu um erro interno."
               });
               break;
           }
