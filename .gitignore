@@ -58,6 +58,8 @@ nunit-*.xml
 src/Desbravadores.Gestao.Infrastructure/Migrations/*
 !src/Desbravadores.Gestao.Infrastructure/Migrations/20260506001534_AddAuditoriaAtualizacaoUsuario.cs
 !src/Desbravadores.Gestao.Infrastructure/Migrations/20260506001534_AddAuditoriaAtualizacaoUsuario.Designer.cs
+!src/Desbravadores.Gestao.Infrastructure/Migrations/20260506164738_SyncPostgresSchema.cs
+!src/Desbravadores.Gestao.Infrastructure/Migrations/20260506164738_SyncPostgresSchema.Designer.cs
 /publish/
 src/Desbravadores.Gestao.Api/dotnet-tools.json
 src/Desbravadores.Gestao.Api/Properties/PublishProfiles/
@@ -67,3 +69,5 @@ src/Desbravadores.Gestao.Infrastructure/DependencyInjection.cs
 src/Desbravadores.Gestao.Api/Program.cs
 docs/[Ww][Ii][Kk][Ii].md
 *.log
+.env
+!.env.example

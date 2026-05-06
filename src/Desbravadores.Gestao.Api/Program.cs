@@ -33,7 +33,7 @@ if (!builder.Environment.IsDevelopment())
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddMediatR(cfg =>
 {

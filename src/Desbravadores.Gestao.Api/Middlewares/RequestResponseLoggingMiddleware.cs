@@ -7,7 +7,9 @@ using Desbravadores.Gestao.Domain.Entities;
 
 namespace Desbravadores.Gestao.Api.Middlewares;
 
-public sealed class RequestResponseLoggingMiddleware(RequestDelegate next)
+public sealed class RequestResponseLoggingMiddleware(
+  RequestDelegate next,
+  ILogger<RequestResponseLoggingMiddleware> logger)
 {
   private const int MaxBodyLength = 8000;
   private static readonly HashSet<string> SensitiveFields =
@@ -23,6 +25,7 @@ public sealed class RequestResponseLoggingMiddleware(RequestDelegate next)
   ];
 
   private readonly RequestDelegate _next = next;
+  private readonly ILogger<RequestResponseLoggingMiddleware> _logger = logger;
 
   public async Task InvokeAsync(HttpContext context, IApiRequestLogRepository logRepository, IWebHostEnvironment environment)
   {
@@ -82,10 +85,16 @@ public sealed class RequestResponseLoggingMiddleware(RequestDelegate next)
 
       try
       {
-        await logRepository.AddAsync(apiLog, context.RequestAborted);
+        await logRepository.AddAsync(apiLog, CancellationToken.None);
       }
-      catch
+      catch (Exception ex)
       {
+        _logger.LogError(
+          ex,
+          "Falha ao registrar log da request {Method} {Path} no banco de dados.",
+          context.Request.Method,
+          context.Request.Path);
+
         // Falhas no logging não devem interromper o fluxo principal.
       }
     }

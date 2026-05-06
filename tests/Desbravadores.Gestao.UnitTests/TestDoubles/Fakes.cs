@@ -150,6 +150,24 @@ internal sealed class FakeUsuarioSessaoRepository : IUsuarioSessaoRepository
   }
 }
 
+internal sealed class FakeApiRequestLogRepository : IApiRequestLogRepository
+{
+  public List<ApiRequestLog> Logs { get; } = [];
+  public CancellationToken LastCancellationToken { get; private set; }
+  public Exception? ExceptionToThrow { get; set; }
+
+  public Task AddAsync(ApiRequestLog apiRequestLog, CancellationToken cancellationToken = default)
+  {
+    LastCancellationToken = cancellationToken;
+
+    if (ExceptionToThrow is not null)
+      throw ExceptionToThrow;
+
+    Logs.Add(apiRequestLog);
+    return Task.CompletedTask;
+  }
+}
+
 internal sealed class FakePasswordHasher : IPasswordHasher
 {
   public List<string> SenhasHasheadas { get; } = [];
