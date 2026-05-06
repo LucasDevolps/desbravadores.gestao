@@ -11,21 +11,13 @@ public static class DependencyInjection
 {
   public static IServiceCollection AddInfrastructure(this IServiceCollection services)
   {
-    bool isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
-    if(isDevelopment) 
-    {
-      services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(
-              Environment.GetEnvironmentVariable("DefaultConnectionDesbravadores")
-              ?? throw new InvalidOperationException("Connection string 'DefaultConnection' não configurada."))
-            );
-    }else{
-      services.AddDbContext<AppDbContext>(options =>
-          options.UseNpgsql(
-            Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' não configurada."))
-          );
-    }
+    string connectionString =
+      Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+      ?? Environment.GetEnvironmentVariable("DefaultConnectionDesbravadores")
+      ?? throw new InvalidOperationException("Connection string 'DefaultConnection' não configurada.");
+
+    services.AddDbContext<AppDbContext>(options =>
+      options.UseNpgsql(connectionString));
 
     services.AddScoped<IUsuarioRepository, UsuarioRepository>();
     services.AddScoped<IUsuarioSessaoRepository, UsuarioSessaoRepository>();
