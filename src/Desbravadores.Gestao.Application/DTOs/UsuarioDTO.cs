@@ -10,6 +10,9 @@ public sealed class UsuarioDTO() : IRequest<IEnumerable<UsuarioDTO>>
   public string Nome { get; set; } = string.Empty;
   public string Email { get; set; } = string.Empty;
   public DateOnly DataCriacao { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+  public DateTime? DataAtualizacao { get; set; }
+  public Guid? UsuarioLogado { get; set; }
+  public string? IpUsuarioLogado { get; set; }
   public Roles Roles { get; set; }
 
   public UsuarioDTO FromEntity(Usuario usuario)
@@ -18,6 +21,9 @@ public sealed class UsuarioDTO() : IRequest<IEnumerable<UsuarioDTO>>
     Nome = usuario.Nome;
     Email = usuario.Email;
     DataCriacao = usuario.DataCriacao;
+    DataAtualizacao = usuario.DataAtualizacao;
+    UsuarioLogado = usuario.UsuarioLogado?.Uuid;
+    IpUsuarioLogado = usuario.IpUsuarioLogado;
     Roles = usuario.Role;
     return this;
   }
@@ -28,6 +34,9 @@ public sealed class UsuarioDTO() : IRequest<IEnumerable<UsuarioDTO>>
     Nome = usuario.Nome;
     Email = usuario.Email;
     DataCriacao = usuario.DataCriacao;
+    DataAtualizacao = usuario.DataAtualizacao;
+    UsuarioLogado = usuario.UsuarioLogado?.Uuid;
+    IpUsuarioLogado = usuario.IpUsuarioLogado;
     return this;
   }
 }

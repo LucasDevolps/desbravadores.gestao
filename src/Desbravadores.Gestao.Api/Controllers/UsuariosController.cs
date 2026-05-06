@@ -7,6 +7,8 @@ using Desbravadores.Gestao.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Desbravadores.Gestao.Api.Controllers;
 
@@ -86,17 +88,25 @@ public sealed class UsuariosController(IMediator mediator) : Controller
     [FromBody] AtualizarUsuarioCommand command,
     CancellationToken cancellationToken = default)
   {
-    command = new AtualizarUsuarioCommand(
-      id,
-      command.Nome,
-      command.Email,
-      command.Senha,
-      command.Roles
-    );
+    command = command with
+    {
+      Uuid = id,
+      UsuarioLogado = RecuperarUsuarioLogado()
+    };
 
     var response = await _mediator.Send(command, cancellationToken);
     return Ok(response);
   }
 
+  private Guid RecuperarUsuarioLogado()
+  {
+    var sub = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+      ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    if (Guid.TryParse(sub, out var usuarioLogado))
+      return usuarioLogado;
+
+    throw new UnauthorizedAccessException("Usuário logado inválido.");
+  }
 
 }

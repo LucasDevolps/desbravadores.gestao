@@ -19,6 +19,9 @@ namespace Desbravadores.Gestao.Infrastructure.Data
         entity.HasIndex(x => x.Uuid)
               .IsUnique();
 
+        entity.HasIndex(x => x.Email)
+              .IsUnique();
+
         entity.Property(x => x.Id)
               .ValueGeneratedOnAdd();
 
@@ -38,9 +41,26 @@ namespace Desbravadores.Gestao.Infrastructure.Data
 
         entity.Property(x => x.DataCriacao)
               .IsRequired();
+
+        entity.Property(x => x.DataAtualizacao)
+              .IsRequired(false);
+
+        entity.Property(x => x.UsuarioLogadoId)
+              .HasColumnName("UsuarioLogado")
+              .IsRequired(false);
+
+        entity.Property(x => x.IpUsuarioLogado)
+              .HasMaxLength(45)
+              .IsRequired(false);
+
         entity
               .Property(x => x.Role)
               .HasConversion<string>();
+
+        entity.HasOne(x => x.UsuarioLogado)
+              .WithMany()
+              .HasForeignKey(x => x.UsuarioLogadoId)
+              .OnDelete(DeleteBehavior.Restrict);
       });
 
       modelBuilder.Entity<UsuarioSessao>(entity =>

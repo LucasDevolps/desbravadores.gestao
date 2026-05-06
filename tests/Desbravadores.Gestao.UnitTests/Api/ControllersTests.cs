@@ -169,12 +169,15 @@ public sealed class ControllersTests
     };
     mediator.Respond(dto);
     var controller = new UsuariosController(mediator);
+    var usuarioLogado = Guid.NewGuid();
+    SetUser(controller, usuarioLogado.ToString(), "jti-token");
     var body = new AtualizarUsuarioCommand(
       Guid.NewGuid(),
       "Maria",
       "maria@email.com",
       "123456",
-      "SECRETARIA");
+      "SECRETARIA",
+      "127.0.0.1");
 
     var result = await controller.AtualizarUsuario(routeId, body, CancellationToken.None);
 
@@ -186,6 +189,8 @@ public sealed class ControllersTests
     Assert.Equal(body.Email, command.Email);
     Assert.Equal(body.Senha, command.Senha);
     Assert.Equal(body.Roles, command.Roles);
+    Assert.Equal(body.IpUsuarioLogado, command.IpUsuarioLogado);
+    Assert.Equal(usuarioLogado, command.UsuarioLogado);
   }
 
   private static void SetUser(Controller controller, string sub, string jti)

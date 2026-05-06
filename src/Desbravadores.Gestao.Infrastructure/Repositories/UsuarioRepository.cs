@@ -23,7 +23,10 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
             Id = u.Uuid,
             Nome = u.Nome,
             Email = u.Email,
-            DataCriacao = u.DataCriacao
+            DataCriacao = u.DataCriacao,
+            DataAtualizacao = u.DataAtualizacao,
+            UsuarioLogado = u.UsuarioLogado == null ? null : u.UsuarioLogado.Uuid,
+            IpUsuarioLogado = u.IpUsuarioLogado
         })
         .ToListAsync(cancellationToken);
 
@@ -42,7 +45,10 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
             Id = u.Uuid,
             Nome = u.Nome,
             Email = u.Email,
-            DataCriacao = u.DataCriacao
+            DataCriacao = u.DataCriacao,
+            DataAtualizacao = u.DataAtualizacao,
+            UsuarioLogado = u.UsuarioLogado == null ? null : u.UsuarioLogado.Uuid,
+            IpUsuarioLogado = u.IpUsuarioLogado
         })
         .FirstOrDefaultAsync(cancellationToken);
 

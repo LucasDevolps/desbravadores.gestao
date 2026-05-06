@@ -72,18 +72,28 @@ public sealed class UsuariosHandlersTests
       role: Roles.DESBRAVADOR));
     var passwordHasher = new FakePasswordHasher();
     var handler = new AtualizarUsuarioCommandHandler(repository, passwordHasher);
+    var before = DateTime.UtcNow;
 
     var dto = await handler.Handle(
-      new AtualizarUsuarioCommand(uuid, "  Maria  ", "  MARIA@EMAIL.COM  ", "nova-senha", "SECRETARIA"),
+      new AtualizarUsuarioCommand(uuid, "  Maria  ", "  MARIA@EMAIL.COM  ", "nova-senha", "SECRETARIA", "127.0.0.1", uuid),
       CancellationToken.None);
+    var after = DateTime.UtcNow;
 
     var usuario = Assert.Single(repository.Usuarios);
     Assert.Equal("Maria", usuario.Nome);
     Assert.Equal("maria@email.com", usuario.Email);
     Assert.Equal("hashed:nova-senha", usuario.Senha);
     Assert.Equal(Roles.SECRETARIA, usuario.Role);
+    Assert.NotNull(usuario.DataAtualizacao);
+    Assert.InRange(usuario.DataAtualizacao.Value, before, after);
+    Assert.Equal(usuario.Id, usuario.UsuarioLogadoId);
+    Assert.Same(usuario, usuario.UsuarioLogado);
+    Assert.Equal("127.0.0.1", usuario.IpUsuarioLogado);
     Assert.Equal(usuario.Uuid, dto.Id);
     Assert.Equal(usuario.Role, dto.Roles);
+    Assert.Equal(usuario.DataAtualizacao, dto.DataAtualizacao);
+    Assert.Equal(usuario.Uuid, dto.UsuarioLogado);
+    Assert.Equal(usuario.IpUsuarioLogado, dto.IpUsuarioLogado);
     Assert.Equal(1, repository.SaveChangesChamadas);
   }
 
@@ -102,7 +112,7 @@ public sealed class UsuariosHandlersTests
     var handler = new AtualizarUsuarioCommandHandler(repository, passwordHasher);
 
     var dto = await handler.Handle(
-      new AtualizarUsuarioCommand(uuid, " ", null, "", null),
+      new AtualizarUsuarioCommand(uuid, " ", null, "", null, "10.0.0.1", uuid),
       CancellationToken.None);
 
     var usuario = Assert.Single(repository.Usuarios);
@@ -110,6 +120,9 @@ public sealed class UsuariosHandlersTests
     Assert.Equal("lucas@email.com", usuario.Email);
     Assert.Equal("old-hash", usuario.Senha);
     Assert.Equal(Roles.DESBRAVADOR, usuario.Role);
+    Assert.NotNull(usuario.DataAtualizacao);
+    Assert.Equal(usuario.Id, usuario.UsuarioLogadoId);
+    Assert.Equal("10.0.0.1", usuario.IpUsuarioLogado);
     Assert.Equal(usuario.Nome, dto.Nome);
     Assert.Empty(passwordHasher.SenhasHasheadas);
     Assert.Equal(1, repository.SaveChangesChamadas);
@@ -118,12 +131,15 @@ public sealed class UsuariosHandlersTests
   [Fact]
   public async Task AtualizarUsuario_throws_when_user_does_not_exist()
   {
+    var usuarioLogadoUuid = Guid.NewGuid();
+    var repository = new FakeUsuarioRepository();
+    repository.Usuarios.Add(UsuarioTestFactory.Create(uuid: usuarioLogadoUuid));
     var handler = new AtualizarUsuarioCommandHandler(
-      new FakeUsuarioRepository(),
+      repository,
       new FakePasswordHasher());
 
     await Assert.ThrowsAsync<KeyNotFoundException>(() => handler.Handle(
-      new AtualizarUsuarioCommand(Guid.NewGuid(), "Lucas", null, null, null),
+      new AtualizarUsuarioCommand(Guid.NewGuid(), "Lucas", null, null, null, "127.0.0.1", usuarioLogadoUuid),
       CancellationToken.None));
   }
 
@@ -137,7 +153,7 @@ public sealed class UsuariosHandlersTests
     var handler = new AtualizarUsuarioCommandHandler(repository, new FakePasswordHasher());
 
     await Assert.ThrowsAsync<InvalidOperationException>(() => handler.Handle(
-      new AtualizarUsuarioCommand(uuid, null, "maria@email.com", null, null),
+      new AtualizarUsuarioCommand(uuid, null, "maria@email.com", null, null, "127.0.0.1", uuid),
       CancellationToken.None));
 
     Assert.Equal(0, repository.SaveChangesChamadas);
@@ -152,7 +168,7 @@ public sealed class UsuariosHandlersTests
     var handler = new AtualizarUsuarioCommandHandler(repository, new FakePasswordHasher());
 
     var dto = await handler.Handle(
-      new AtualizarUsuarioCommand(uuid, null, "  LUCAS@EMAIL.COM  ", null, null),
+      new AtualizarUsuarioCommand(uuid, null, "  LUCAS@EMAIL.COM  ", null, null, "127.0.0.1", uuid),
       CancellationToken.None);
 
     Assert.Equal("lucas@email.com", dto.Email);
@@ -168,8 +184,23 @@ public sealed class UsuariosHandlersTests
     var handler = new AtualizarUsuarioCommandHandler(repository, new FakePasswordHasher());
 
     await Assert.ThrowsAsync<InvalidOperationException>(() => handler.Handle(
-      new AtualizarUsuarioCommand(uuid, null, null, null, "invalid"),
+      new AtualizarUsuarioCommand(uuid, null, null, null, "invalid", "127.0.0.1", uuid),
       CancellationToken.None));
+  }
+
+  [Fact]
+  public async Task AtualizarUsuario_throws_when_logged_user_does_not_exist()
+  {
+    var uuid = Guid.NewGuid();
+    var repository = new FakeUsuarioRepository();
+    repository.Usuarios.Add(UsuarioTestFactory.Create(uuid: uuid));
+    var handler = new AtualizarUsuarioCommandHandler(repository, new FakePasswordHasher());
+
+    await Assert.ThrowsAsync<UnauthorizedAccessException>(() => handler.Handle(
+      new AtualizarUsuarioCommand(uuid, null, null, null, null, "127.0.0.1", Guid.NewGuid()),
+      CancellationToken.None));
+
+    Assert.Equal(0, repository.SaveChangesChamadas);
   }
 
   [Fact]
